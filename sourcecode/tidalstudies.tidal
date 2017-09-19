@@ -6,20 +6,20 @@ sound (samples "akuma2*8" (irand 5)),
 sound (samples "akuma1*8" (irand 5))
 ]
 |+| unit "c"
-|+| speed 8 |+| gain "0.85"
-|+| cutoff "6000"
+|+| speed 8 |+| gain "0.8"
+|+| cutoff "8000"
 
 d1 silence
 
 -- do
 -- let pattern = "[1 0.25, 1 0/2 1*2 1 0*8 1]"
-d2 $ density 1 $ jux (|+| speed "0.1") $ every 2 (rev) $ stack [
+d2 $ density 1 $ jux (|+|speed "0.25") $ every 2 (rev) $ stack [
 sound (samples "gltch*8" (irand 12)),
 sound "beacch*8 [monst:2/5 monst/4] [~ beacch*2] [~ beack:1*2?]" |+| shape "0 0.5 0 0" |+|cut 1,
-sound "~ defdo:1/2 nau/2 defdo/3" |+|cut 1
+sound "~ defdo:1/2? nau/2 defdo/3" |+|cut 1
 ]
 |+| delayfeedback "0.7" |+| delaytime "0.6"
-|+| speed "[ 1 2 0.5 ]" |+| cut 1
+|+| speed "[ 1/2 2*2 0.5 ]" |+| cut 1
 
 d2 silence
 

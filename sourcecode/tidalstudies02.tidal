@@ -1,0 +1,12 @@
+bps (150/120)
+
+
+d1 $ whenmod 6 3 (|+|delay 0.25 ) $ (|+|delaytime (scale 0.01 0.5 $ sine1))
+$ foldEvery [2,3] (density 1 )  $ whenmod 6 4 (rev) $ stack[
+sound (samples "kit5*8 kit2*2, kit4 kit6*8" (irand 4)),
+sound (samples "~ [~ b18b]" (run 1)),
+whenmod 8 6 (|+|speed "0.5, 0.25, 1") $ degradeBy 0.5 $ foldEvery [2,3] (|+|crush "4") $ sound "electrowave",
+every 4 (0.125 ~>) $ whenmod 3 2 (stut 8 0.75 0.25) $ sound "ulh*4" |+|cut 2 |+| gain "1.1"
+]
+
+hush
