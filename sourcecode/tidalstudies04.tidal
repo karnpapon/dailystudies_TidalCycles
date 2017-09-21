@@ -1,0 +1,21 @@
+
+bps(150/120)
+
+let pattern = "1 0 1*4 0 1*8 0 0 1"
+
+let inverse 1 = 0
+    inverse 0 = 1
+
+d1 $ every 3 (|=| gain "{0 1 1}%8") $ slowspread ($) [jux (iter 2), (|+| accelerate "-2"), (|+| speed "1 0.5 0.9"),
+(|+| delaytime (scale 0.25 0.5 $ sine1)), (|+|delayfeedback "0.5")] $
+stack [
+every 5 (const $ sound "~") $
+sound "~ arp" |+|cut "1",
+degradeBy "0.5 1" $ foldEvery [2,3] (|+| accelerate "-1 1") $ sound (samples "gltch*16" (irand 12)) #cut "1" ,
+whenmod 8 6 (|=|coarse "128 64 32 48") $ sound "~ ~ [~ burnch*4] [~ burnch*2]",
+whenmod 6 4 (jux (iter 4)) $ every 3 (|+| gain (inverse <$> pattern)) $ sound "teks"
+]
+
+d2 $ whenmod 8 6 (|=|gain pattern) $ (|=| gain "0 1 0 1 1 0 1 0") $ sound "fk:1*8"
+
+hush
