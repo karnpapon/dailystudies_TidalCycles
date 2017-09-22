@@ -1,0 +1,18 @@
+
+bps (120/120)
+
+let pnote = "e4 fs4 b4 cs5"
+let mnote = "c(3,8) g [c6*2 fs4] e*2" + "<0 0 7 5>"
+
+d1 $ slowspread ($) [rev, (|=|speed "0.9 1 0.25")] $ stack [
+every 4 (|=|speed 0.5) $
+sound "arp" |=|crush "5",
+every 4 (const $ sound "909*2")$ sound "909 ~ ~ [~ teks] [~ teks]",
+n (pnote) # sound "superpiano" |=|vowel "a",
+slow 2 $ n(mnote) # sound "supermandolin"
+]
+|=| room 0.4 |=| size 0.8
+|=|shape 0.3
+
+
+hush
