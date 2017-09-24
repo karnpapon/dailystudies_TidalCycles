@@ -1,0 +1,36 @@
+-- exploring
+-- 1. pattern concatenation.
+-- 2. shorten variables.
+
+-- new leaned function
+-- 1.cat(pattern1,pattern2)
+-- 2.offadd(offsettime,offsetnote)
+
+cps 0.5
+
+let chp1 = "d3 fs3 b3 d3 fs3 b3 d3 fs3 b3 d3 fs3 b3 d3 fs3 b3 d3"
+
+let chp2 = "c3 e3 a3 c3 e3 a3 c3 e3 a3 c3 e3 a3 c3 e3 a3 c3"
+
+let chp3 = "c3 f3 gs3"
+
+let chp4 = "b2  e3 g3"
+
+d1 $ slow 2 $ stack
+[
+cat [n(offadd 0.25 12 chp1),n(offadd 0.25 24 chp2)] # sound "supersaw" |+|cutoff ((slow 2 $ scale 0.1 0.8 $ sinewave)* "3000"),
+every 3 (stut 8 0.25 0.25) $ foldEvery [2,3] (#crush "4") $ sound (samples "teks*4" (irand 6))|=| delaytime "0.5" |=|delayfeedback "1"
+]|=|room "0.4" |=|size "0.3" |=| release "0.8"
+
+
+do
+let inverse 1 = 0
+    inverse 0 = 1
+let pat = "1 [0 1] 0 [1 0] 1 0 [0 1] [0 1]"
+let pat2 = "1 1"
+let x = gain pat
+let y = gain(inverse <$> pat)
+d2 $ x # sound "909"
+
+
+hush
