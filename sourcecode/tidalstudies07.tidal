@@ -1,0 +1,37 @@
+-- exploring
+-- 1. drone-esque approach.
+-- 2. use up function as pattern instead of gain.
+-- 3. limited irand floor number.
+
+-- new leaned function
+-- 1.none.
+
+cps 0.5
+
+let pat1 = "{0*2 ~ [0 ~] ~ 0 [~ 0] 0}%8"
+    pat2 = "{[~ 0] 0 ~ 0 [~ 0] ~ 0}%4"
+    pat3 = "{0 0*4 [~ 0] [~ 0] 0*2  0 ~ 0*4 ~ 0 -12 0 ~ [~ 0] [~ 0] ~ 0*2 -12}%8"
+    pat4 = "{0 0*2 [~ 0] [~ 0] 0 0 -24 0*4 ~ 0 ~ 0 -12 0*2 ~ [~ 0] [~ 0] ~ 0*2 -12}%16"
+    pat5 = "{[~ 0] 0 0 ~ 0 -12 0*2 ~ [~ 0] [~ 0] ~ 0 -12 0*4 ~ [~ 0] [~ 0] ~ 0*2 -12}%16"
+    pat6 = "{~ 0 ~ 0 -12 0*4 0 0*2 [~ 0] -12 0*4 ~ 0 ~ 0 -12 0*2 ~ [~ 0] [~ 0] ~ 0*2 -12}%16"
+    pat7 = "{ ~ ~ 0 ~ 0 ~ 0 ~ 0 ~ ~ }%8"
+
+let gtfo = const $ sound "~"
+
+let chp3 = "c3 f3 gs3 c3 f3 gs3 c3 f3 gs3 c3 f3 gs3 c3 f3 gs3 c3"
+    chp4 = "b2 e3 g3 b2 e3 g3 b2 e3 g3 b2 e3 g3 b2 e3 g3"
+
+d1
+$ stack [
+slow 0.25 $ (jux (|=| up "15")) $ speed "0.5" # sound "sax:2" |=|cutoff (scale 100 2000 $ sine1 ) |=| gain "1.2",
+every 2 (chop 2)$
+every 4 (|=| up pat3)$
+up pat4 # sound (samples "flick*6" (irand 10 + 1)),
+slow 2 $ sound "kit3:4*2",
+gtfo $ foldEvery [2,3] (|=| coarse "64 32 14 12") $ every 2 (|=| up pat1) $ up pat4 |=| sound (samples "pluck*8" (irand 6)) |=| speed "4",
+up pat7 |=| sound "teks:1",
+slowcat [n(chp3),n(chp3), n(chp4),n(chp4)] # sound "supersaw" |=| cutoff (slow 8 $ (scale 300 2500 $ sine1))
+]
+
+
+hush
