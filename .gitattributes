@@ -1,2 +1,2 @@
 * linguist-vendored
-*.haskell linguist-vendored=false
+*.tidal linguist-language=Java
