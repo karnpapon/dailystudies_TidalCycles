@@ -2,7 +2,7 @@
 -- 1. pattern concatenation.
 -- 2. shorten variables.
 
--- new leaned function
+-- new learned function
 -- 1.cat(pattern1,pattern2)
 -- 2.offadd(offsettime,offsetnote)
 

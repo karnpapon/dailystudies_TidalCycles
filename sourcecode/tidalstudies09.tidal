@@ -1,0 +1,25 @@
+do
+  now' <- getNow
+  let now = nextSam now'
+  let retrig = (now `rotR`)
+  d1 $ retrig $ slowcat [
+      sound "bd*2",
+      sound "feel:2*6",
+      sound "ul(5,8)",
+      sound "cp*8",
+      s "arpy*5" # n (run 30),
+      sound "bass(3,8)" ]
+
+
+d1 $ slowcat [
+sound "bd*2",
+sound "feel:2*6",
+sound "ul(5,8)",
+sound "cp*8",
+sound "arpy*5" # n (run 30),
+sound "bass(3,8)" ]
+
+
+d1 $ sound "bd*4"
+
+hush
