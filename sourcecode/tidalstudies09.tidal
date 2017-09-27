@@ -1,25 +1,38 @@
-do
-  now' <- getNow
-  let now = nextSam now'
-  let retrig = (now `rotR`)
-  d1 $ retrig $ slowcat [
-      sound "bd*2",
-      sound "feel:2*6",
-      sound "ul(5,8)",
-      sound "cp*8",
-      s "arpy*5" # n (run 30),
-      sound "bass(3,8)" ]
+-- exploring
+-- 1. chained chords pattern with Euclidean rythme.
+
+-- new learned function
+-- 1.sometimes
+
+cps (0.5)
 
 
-d1 $ slowcat [
-sound "bd*2",
-sound "feel:2*6",
-sound "ul(5,8)",
-sound "cp*8",
-sound "arpy*5" # n (run 30),
-sound "bass(3,8)" ]
+let pat1 = "{0*2 ~ [12 ~] ~ 0*4 [~ 0] 0}%8"
+    pat2 = "{[~ 0] 0 ~ 0 [~ 0] ~ 0}%8"
+    pat3 = "{0 0*4 [~ 0] [~ 0] 0*2 0 ~ 0*4 ~ 0 -12 0 ~ [~ 0] [~ 0] ~ 0*2 -12}%8"
+    pat4 = "{0 0*2 [~ 0] [~ 0] 0 0 -12 0*4 ~ 0 ~ 0 ~ [~ 0] [~ 0] ~ 0*2 -12}%8"
+    pat5 = "{[~ 0] 0  0*2 ~ [~ 0] [~ 0] ~ 0 -12 0*4 ~ [~ 0] [~ 0] ~ 0*2 -12}%8"
+
+let chpat = "{c5, e5,f5 ,g5, a5}"
+
+d1 $ slowspread ($) [rev, (|=|accelerate "0.3 -0.1")]
+$ sometimes (#coarse "24 16 32")
+$ stack[
+  up pat3 |=| sound "kit3" #n (irand 64),
+  up pat2 |=| sound "bass:2 bass:1 bass bass:3",
+  sound "gltch:1" #speed "1.0 0.5",
+  up pat1 |=| sound (samples "gltch"(irand 8)) |=| cut "2",
+  up pat5 |=| sound "gltch:2" |=| cut "3"
+]
+-- #cutoff (scale 400 16000 $slow 8 $sine1)
+|=|gain "1.1"
 
 
-d1 $ sound "bd*4"
-
-hush
+d2 $ sometimes (|=|coarse "24 43 64")
+$ sometimes (#accelerate "0.5 -0.1 0.2")
+$ stack[
+sound "supersaw(5,16,9)" # n chpat |+| n "-12",
+sound "supersaw(5,16,7)" # n chpat |+| n "7",
+sound "supersaw(5,16,5)" # n chpat |+| n "-7",
+sound "supersaw(5,16)" # n chpat
+] |=| gain "0.75"
