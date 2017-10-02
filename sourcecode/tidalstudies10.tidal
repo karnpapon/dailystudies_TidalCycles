@@ -1,0 +1,108 @@
+-- exploring
+-- 1. send data via OSC to openFrameworks .
+
+-- new learned function
+-- 1. none.
+
+
+
+
+
+:load ~/OSCSenderToOF
+
+
+-- custom osc send to openFrameworks
+
+module OSCSenderToOF where
+import Sound.Tidal.Stream
+import Sound.Tidal.Pattern
+import Sound.Tidal.Parse
+import Sound.Tidal.OscStream
+import Sound.Tidal.Context
+
+openFrameworks = Shape {
+  -- Define the parameters. The first bit is the type - S for
+  -- string, F for float, I for integer. The second part is the
+  -- name of the parameter. The third is the default value for the
+  -- parameter (only used if 'namedParams' defined below is set to
+  -- 'False', so set to Nothing here).
+  params = [
+    S "text" Nothing
+    -- F "vel" (Just 1.0),
+    -- F "r" (Just 1.0),
+    -- F "g" (Just 1.0),
+    -- F "b" (Just 1.0)
+  ],
+  -- Whether to add the current cycles per second to the message
+  cpsStamp = False,
+  -- How far ahead of time to send the message
+  latency = 0.0
+}
+
+openFrameworksSlang = OscSlang {
+  -- the OSC 'path'
+  path = "/test",
+  -- Whether to timestamp the message with
+  -- its logical time - can be 'BundleStamp'
+  -- (put in a timestamped bundle),
+  -- 'MessageStamp' (put in the message
+  -- parameters), or 'NoStamp' (don't timestamp)
+  timestamp = NoStamp,
+  -- Whether to interleave the parameter
+  -- names in the message. If this isn't
+  -- set, all parameters will be sent, using
+  -- defaults set above if they're not
+  -- given in a tidal pattern
+  namedParams = False,
+  -- Parameters to stick on the beginning of
+  -- a message
+  preamble = []
+}
+
+-- a function to start your OSC stream, where "127.0.0.1" is the
+-- target host and 8000 the port number
+openFrameworksStream = do
+  s <- makeConnection "127.0.0.1" 8000 openFrameworksSlang
+  stream (Backend s $ (\_ _ _ -> return ())) openFrameworks
+
+-- pattern parameter functions, where makeS is for string, makeF for floats, and so on.
+-- Many parameter functions are already defined and don't need re-defining, see here:
+-- https://github.com/tidalcycles/Tidal/blob/master/Sound/Tidal/Params.hs
+text = makeS openFrameworks "text"
+-- vel = makeF openFrameworks "vel"
+r = makeF openFrameworks "r"
+g = makeF openFrameworks "g"
+b = makeF openFrameworks "b"
+
+
+
+
+
+o1 <- openFrameworksStream
+o2 <- openFrameworksStream
+
+cps 0.7
+
+let pat1 = "{0*2 ~ [12 ~] ~ 0*4 [~ 0] 0}%8"
+    pat2 = "{[~ 0] 0 ~ 0 [~ 0] ~ 0}%8"
+    pat3 = "{0 0*4 [~ 0] [~ 0] 0*2 0 ~ 0*4 ~ 0 -12 0 ~ [~ 0] [~ 0] ~ 0*2 -12}%8"
+    pat4 = "{0 0*2 [~ 0] [~ 0] 0 0 -12 0*4 ~ 0 ~ 0 ~ [~ 0] [~ 0] ~ 0*2 -12}%16"
+    pat5 = "{[~ 0] 0  0*2 ~ [~ 0] [~ 0] ~ 0 -12 0*4 ~ [~ 0] [~ 0] ~ 0*2 -12}%8"
+
+d2 silence
+
+d2 $ every 2 (|=|up pat5) $ up pat4 # sound "bd"
+
+o1 $ every 2 (|=|gain pat5) $ gain pat4 # text "{Hello World how are youu}*27"
+-- #r "2"
+-- #g "1"
+-- #b "1"
+
+o1 silence
+
+d1 $ sound "bd*4"
+o2 $ text "1 2 3 4"
+
+o2 silence
+
+hush
