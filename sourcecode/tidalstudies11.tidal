@@ -1,0 +1,49 @@
+-- exploring
+-- 1.controlling SuperCollider.
+-- 2.Define custom synth via SynthDef(on SC side).
+
+-- new learned function
+-- 1. none.
+
+-- // Resources
+-- Atsushi Tadokoro articles
+-- https://qiita.com/yoppa/items/ac04af38625e1c9027e5.
+
+module Sound.Tidal.SuperCollider where
+
+import Sound.Tidal.Stream
+import Sound.Tidal.Pattern
+import Sound.Tidal.Parse
+import Sound.OSC.FD
+import Sound.Tidal.OscStream
+
+
+-- init sending msg to SC and define args.
+(sc, shape) <- scStream "scsine" [ F "freq" (Just 440.0)] 0
+
+(sc1,shape1) <- scStream "schh"
+[F "vol" (Just 0.5),
+  F "freq" (Just 4000),
+  F "atk" (Just 0.1),
+  F "rel" (Just 0.2),
+  F "pos" (Just 0)]
+  0
+
+-- define params to send to SuperCollider.
+let freq = makeF shape "freq"
+let freq1 = makeF shape1 "freq"
+let vol1 = makeF shape1 "vol"
+
+cps(150/240)
+
+sc $ freq "440 660 110 220"
+
+sc1 $ jux(iter 8) $ freq "3100 2000 1000 [3500 2000]"
+
+sc $ jux(iter 8) $ freq "440 [660 110] [220 880] 330"
+
+sc $ jux(iter 8) $ jux (iter 4) $ freq "440 [660 110] [220 880] 330"
+
+sc $ jux (iter 2) $ jux(iter 8) $ jux (iter 4) $ freq "440 [660 110] [220 880] 330"
+
+sc1 silence
