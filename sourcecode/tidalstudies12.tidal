@@ -1,0 +1,54 @@
+-- exploring
+-- 1.tranform/morphing pattern by using "t1".
+
+-- new learned function
+-- 1.wedge(1stSamplesRatio/2ndSamplesRatio).
+-- 2.superwash.
+-- 3.Xfade.
+----------------------------------------------------------------------
+
+let pattern1 = "[~ 2] [~ ~] [2 0 0] ~ [2 0]%8"
+let pattern2 = "[~ 2 0 ] ~ [~ ~] [2 0 0] ~ [2 0] [2 0 0] %8"
+
+
+d1 $ stack [
+up pattern1 # sound "bd bd bd",
+up pattern2 # sound "sd"
+]
+
+----------------------------------------------------------------------
+
+-- "wedge(first/sec)" manage two sets of samples group into one cycle
+-- the ratio depends on first params as ratio compare to second params.
+d1 $ wedge (1/4) (sound "bd*2") (sound "hh*2")
+
+----------------------------------------------------------------------
+
+d1 $ sound "jvbass(3,8)"
+t1 (anticipateIn 4) $ sound "sd(5,8)"
+
+----------------------------------------------------------------------
+
+d1 $ sound "bd(3,8)"
+t1 clutch $ sound "[hh*4, odx(3,8)]"
+
+----------------------------------------------------------------------
+
+d1 $ sound "feel*4 [feel:2 sn:2]"
+
+-- superwash applied function to main playing pattern then switch to anothers(pattern/function).
+-- "superwash(fuction01)(function02) param1 param2 param3"
+-- param1 is main playing pattern.
+-- param2 is applied function01 ratio.
+-- param3 is applied function02 ratio.
+-- ratio require 3 params.
+t1 (superwash (# accelerate "-1")(striate 12) 1 4 6) $ sound "bd [odx:2 sn/2]"
+
+----------------------------------------------------------------------
+
+d1 $ sound (samples "akuma1*6"(irand 12))
+t1 xfade $ sound "can*3"
+
+----------------------------------------------------------------------
+
+hush
