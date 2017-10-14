@@ -1,0 +1,33 @@
+-- exploring
+-- 1.tranform/morphing pattern by using "t1" (part2).
+
+-- new learned function
+-- 1.clutchIn
+-- 2.histpan
+----------------------------------------------------------------------
+
+cps 1
+
+let pattern = "[0 2 ~] ~ ~ [2 -1 2] [~ 2 ~] 0 2"
+let pattern2 = "{~  2 0 [0 2 ~] ~[2 -1 2]}%8"
+let pattern3 = "[0 2 ~] ~ [0 2 ~] ~[2 -1 2]"
+
+d1 $ up pattern # sound "teks"
+
+d1 $ sound "[hh hh] ~"
+
+
+-- clutchIn // change to new pattern by take out previous pattern and put new pattern(s) rhythmic proportionally.
+t1 (clutchIn 8) $ sound "hh*2 [burnch ~] 909 gltch" |=|gain "1.2"
+
+-- histpan // change to new pattern with pan effect applied to.
+t1 (histpan 8) $ sound "hh*2 [burnch ~] 909 gltch" |=|gain " 1.2"
+
+t1 (histpan 8) $ sound "[hh*2] ~"
+
+-- t1 accepted chained fucntion.
+t1 (clutchIn 8) $ every 4 (rev) $ stack [
+up pattern # sound (samples "gltch" (irand 12)),
+foldEvery[2,4] (#up pattern3) $ sound "bd ~ sd teks burnch:2",
+every 2 (#up pattern2) $ sound "~ ~ ~ ~ [hh*2]" |=| gain "1.2"
+]
