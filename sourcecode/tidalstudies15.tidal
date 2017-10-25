@@ -1,0 +1,43 @@
+-- exploring
+-- 1.tranform/morphing pattern by using "t1" (part3).
+-- 2.Re-creation of Steve Reich piece's "Piano Phase" and "Clapping Music"
+
+-- new learned function
+-- 1.mortal
+-- 2.wait
+-- 3.discretise
+----------------------------------------------------------------------
+
+
+-- ifp ((checkingResults).(cyclesTobeMod))
+--     (applied function when checkingResults == 0 or returns True)
+--     (applied function when checkingResults == 1 or returns False)) $
+-- // TIPS : applied function should have only 2 functions.
+
+let gtfo = const $ sound "~"
+
+d1 $ ifp ((== 0).(flip mod 2))
+  (# crush "4")
+  (# coarse "24") $
+  sound "bd*8"
+
+
+----------------------------------------------------------------------
+
+-- mask (MaskedPattern) :: Pattern Bool
+-- // applies pattern (in "cat") to "MaskedPattern" which is switch algorithmically between samples within cat function.
+-- // have to defines "::Pattern Bool"
+
+let pattern = "e4 fs4 b4 cs5 "
+
+d1 $ stack[
+s (mask ("1 1 1 1 ~ 1 1 1" :: Pattern Bool)
+  (cat ["sd*8", "bd*4"] )),
+density 4 $ n pattern # sound "supermandolin"
+|=| vowel "e" |=| gain "1.5"
+|=| cutoff (scale 500 3000 (slow 8 $ sine1)),
+foldEvery [2,4] (# up "-6") $ up "-5" # sound "bass" |=| gain "1.2"
+]|=| delay "0.25" |=| delayfeedback "0.25" |=| delaytime "0.25"
+
+
+d2 $ sound "hh*16"

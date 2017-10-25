@@ -1,0 +1,72 @@
+-- exploring
+-- 1.tranform/morphing pattern by using "t1" (part3).
+-- 2.Re-creation of Steve Reich piece's "Piano Phase" and "Clapping Music"
+
+-- new learned function
+-- 1.mortal
+-- 2.wait
+-- 3. discretise
+----------------------------------------------------------------------
+
+d1 $ sound "bd hh*3"
+
+-- mortal(time1 time2) gradually takes out sound(samples) over time
+t1 (mortal 2 4) $ sound "teks burnch bd hh"
+
+t1 (wait 4) $ sound "teks burnch ~ hh*2"
+
+d1 $ n (toScale [0, 4, 7] "0 1 2 3") # sound "superpiano"
+
+cps (1/0.788)
+
+do
+    now' <- getNow
+    let now = nextSam now'
+    let iters = 400
+    d1 $ (now-1) ~> do {
+        x <- slow (iters) $ run iters;
+        jux (((x/iters) ~>)) $ sound "rain"}
+
+bps (120/120)
+
+let pianoPhase = "e4 fs4 b4 cs5 d5 fs4 e4 cs5 b4 fs4 d5 cs5"
+
+d1 $ stack [
+(((discretise 8 $ slow 48 $ run 12)/6) ~>) $
+n pianoPhase # sound "superpiano",
+gtfo $ n pianoPhase # sound "superpiano" |=| vowel "e"
+]
+
+d1 $ now ~> do {x <- slow (12 * 12) $ run  12; jux ((x/12) <~) $ sound "cp ! ! ~ cp ! ~ cp ~ cp ! ~"}
+
+d1 $ stack [
+(((discretise 1 $ slow 48 $ run 12)/12) ~> ) $
+sound "cp ~ cp ~ cp ! ~ cp ~ cp cp ~",
+gtfo $ sound "sn:2 ~ sn:2 ~ ",
+sound "bd"
+]
+
+cps 0.5
+
+d1 $ stack [
+    sound    "cp ~ cp ~ cp ! ~ cp ~ cp cp ~",
+    iter 12 $ sound "cp ~ cp ~ cp ! ~ cp ~ cp cp ~ " # vowel "e",
+    sound  "bd "
+]
+
+d2 $ sound "hh*8"
+
+let gtfo = const $ sound "~"
+
+cps 0.5
+
+d1 $ stack [ (((run 12)/12) ~> ) $
+gtfo $ sound "cp ~ cp ~ cp ! ~ cp ~ cp cp ~",
+sound "cp ~ cp ~ cp ~ cp ! ~ cp ~ cp " # vowel "e"]
+
+d1 $ stack [
+    sound "cp ~ cp ~ cp ! ~ cp ~ cp cp ~",
+    iter 12 $ sound "cp ~ cp ~ cp ~ cp ! ~ cp ~ cp " # vowel "e"
+]
+
+d1 $ sound "cp ~ cp ~ cp ! ~ cp ~ cp cp ~"
