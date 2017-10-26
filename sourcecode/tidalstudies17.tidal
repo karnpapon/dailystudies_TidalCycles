@@ -1,0 +1,34 @@
+-- exploring
+-- 1.play with striate'
+
+-- new learned function
+-- 1.striate'
+----------------------------------------------------------------------
+
+let pattern = "{1 0  1 ~ ~ 1 ~ 0 1 0 1 ~}%6"
+
+
+d1 $ stack [
+-- every 2 ((density 8).(linger 0.125))
+slow 4
+$ striate' 32 (0.125)
+$ sound "khan"
+# resonance (slow 6 (scale 0.2 0.7 sine1))
+# cutoff (slow 8 $ (scale 0.05 0.95 sine1 * 8000))
+# pan (slow 4 rand),
+-- sound "[tbck:1*2] ~",
+sound "[tbck:1*2] ~" |=| gain 1.6,
+sound "~ [supergong*2]",
+sound "~ [sd*4]",
+sound (samples "gltch*8" (irand 12)) |=| cut 1,
+slow 4 $ striate 16 $
+sound "numbers:0 numbers:1 numbers:2 numbers:3"
+]
+|=| up "-8"
+
+-- differentiation between striate and chop
+-- basically says, striate cut up all sample's pattern
+-- while chop cut up individual samples.
+d2 $ slow 4 $ striate 16 $ sound "numbers:0 numbers:1 numbers:2 numbers:3"
+
+d1 $ slow 4 $ chop 16 $ sound "numbers:0 numbers:1 numbers:2 numbers:3"

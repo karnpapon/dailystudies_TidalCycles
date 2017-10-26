@@ -1,0 +1,54 @@
+-- exploring
+-- 1.new function.
+-- 2.use Scales and shorten variables.
+-- 3.defines "now".
+
+-- new learned function
+-- 1.Scales
+-- 2.linger
+-- 3.now
+----------------------------------------------------------------------
+
+
+import qualified Sound.Tidal.Scales as Scales
+
+let majScale = toScale Scales.harmonicMajor
+
+let gtfo = const $ sound "~"
+
+--
+-- scale requires importing.
+d1 $ degradeBy 0.5 $ every 4 ( (# slow "2" (speed "-3")). (linger 0.25) ) $ foldEvery [2,4] (rev) $ stack [
+gtfo $ n ((+5) <$> "{c3 f3 gs3 c3 f3 gs3}") # sound "supersaw",
+n (majScale (run 8)) # sound "jvbass",
+n (majScale (run 6))  # sound "superpiano",
+sound "gabba*6"
+]
+
+
+-- "now" should be setting up before using.
+now <- getNow
+
+-- seqP arranges pattern depends on cycle time setting and stop when reachs the end.
+-- seqP needs time back to 0 everytime before the function is called.
+-- so you have to execute getNow everytime before using this function.
+d1 $ (pure now) ~> seqP [
+  (0, 12, sound "bd*4"),
+  (5, 12, sound "hh*2 [sn cp] cp future*4"),
+  (8, 12, sound (samples "arpy*8" (run 16)))
+]
+
+-- seqPLoop no needs to reset time to 0.
+d1 $ seqPLoop [
+  (1, 24, sound "tacscan" # slow 24 (cutoff (2600 * sine1 + 400))),
+  (12, 20, sound "ade:4"),
+  (4, 8, sound "feelfx:5!8" # n (choose[2, 7]) # speed (run (rand * 4 + 2)) # gain "0.8")
+] # tremolorate "5.0" # tremolodepth (slow 12 sine1)
+
+----------------------------------------------------------------------
+
+-- exclaimation marks (!) is represent of repeating samples.
+d1 $ ifp ((== 0).(flip mod 6))
+    (# crush "6")
+    (# n (choose[1, 7])) $
+    sound "[bd:4!4, sid:0*2, [~ sid:8]*2]"
