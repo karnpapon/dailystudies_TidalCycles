@@ -33,7 +33,7 @@ let pattern = "e4 fs4 b4 cs5 "
 d1 $ stack[
 s (mask ("1 1 1 1 ~ 1 1 1" :: Pattern Bool)
   (cat ["sd*8", "bd*4"] )),
-density 4 $ n pattern # sound "supermandolin"
+density 18 $ n pattern # sound "supermandolin"
 |=| vowel "e" |=| gain "1.5"
 |=| cutoff (scale 500 3000 (slow 8 $ sine1)),
 foldEvery [2,4] (# up "-6") $ up "-5" # sound "bass" |=| gain "1.2"

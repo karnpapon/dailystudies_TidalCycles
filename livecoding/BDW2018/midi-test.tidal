@@ -1,0 +1,27 @@
+import Sound.Tidal.MIDI.Context
+import Sound.Tidal.MIDI.VolcaBass
+
+devices <- midiDevices
+
+m1 <- midiStream devices "Scarlett 2i4 USB" 1 volcabassController
+
+bps (180/120)
+
+m1 $ every 4 (|+|n 2) $ midinote "{40}%2"
+
+d1 $ stack[
+every 3 (|=| coarse 4) $ sound "hh*8",
+foldEvery[3,4] (rev) $ every 4 (0.25 ~>) $ sound "bd*2 cp*2 ~ ~"
+]
+
+d1 $ seqP [ 
+  (0, 12, sound "bd bd*2"),
+  (4, 12, sound "hh*2 [sn cp] cp future*4"),
+  (8, 12, sound (samples "arpy*8" (run 16)))
+]
+
+
+m1 silence
+
+
+d1 silence

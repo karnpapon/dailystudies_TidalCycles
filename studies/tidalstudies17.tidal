@@ -8,14 +8,14 @@
 let pattern = "{1 0  1 ~ ~ 1 ~ 0 1 0 1 ~}%6"
 
 
-d1 $ stack [
+d1  $ whenmod 16 8 (|=| up "-6") $ stack [
 -- every 2 ((density 8).(linger 0.125))
 slow 4
 $ striate' 32 (0.125)
 $ sound "khan"
 # resonance (slow 6 (scale 0.2 0.7 sine1))
 # cutoff (slow 8 $ (scale 0.05 0.95 sine1 * 8000))
-# pan (slow 4 rand),
+# gain 0.8,
 -- sound "[tbck:1*2] ~",
 sound "[tbck:1*2] ~" |=| gain 1.6,
 sound "~ [supergong*2]",

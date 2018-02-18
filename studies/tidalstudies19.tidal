@@ -1,0 +1,62 @@
+-- exploring
+-- 1.
+
+-- new learned function
+-- 1.someCyclesBy
+-- 2.
+----------------------------------------------------------------------
+
+
+bps (180/120)
+-- apply function to cycle (fast 4 apples function in regular division of 8 (one cycle))
+d1 $ someCyclesBy 0.25 (fast 4) $ sound "bd*8"
+
+do
+  let progression p = p |*| up (slow 8 $ "0 5 10 7")
+  let melody = progression $ fast 2 $ up "0 3 7 10"  # s "pluck" |*| up "12"
+  let bass = progression $ s "pluck" |*| speed "0.5" |*| gain "1.0" # shape 0.6 # cut "-1"
+  d1 $ stack [melody, bass]
+-- speed determine "note" or playback speed of samples using "up" function togather to higher specific notes up.
+
+
+
+do
+  let progression p = p |+| n (slow 8 $ "0 5 10 7")
+  let melody = progression $ stut 4 0.3 1.033 $ fast 2 $ note "0 3 7 10" # s "superpiano" |+| note "12"
+  let bass = progression $ s "superpiano" |*| speed "0.5" |*| gain "1.0"  # cut "-1"
+  d1 $ stack [melody, bass]
+
+
+do
+  cps 1
+  let melody = slow 4 $ up "12 ~ ~ 12 ~ ~ 12 ~ 13 ~ ~ 13 ~ ~ 13 ~ 14 ~ ~ 14 ~ ~ 14 ~ 15 ~ ~ 15 ~ ~ 15 ~" # s "pluck"
+  d1 $ melody |*| up "[0,3,7,10]"
+-- or
+
+do
+  cps 1
+  let melody = slow 4 $ n "12 ~ ~ 12 ~ ~ 12 ~ 13 ~ ~ 13 ~ ~ 13 ~ 14 ~ ~ 14 ~ ~ 14 ~ 15 ~ ~ 15 ~ ~ 15 ~" # s "superpiano" # legato 8
+  d1 $ melody |+| n "[0,3,7,10]"
+
+  d1 $ n "0 3 7 5 8 12 7 10 14 0 3 7" # s "supermandolin"
+
+  d1 $ s "supermandolin*6" # n "0 3 7 5 8 12 7 10 14 0 3 7"
+
+  cps 0.5
+
+  do
+    cps 2
+    let rhythm = s "[bd, <~ sn:3>, hh(1,2,1)]"
+    let bass = s (slow 3 "bass:3(<7 5 6>*2,12)") # up (slow 4 "0 1 2 3")
+    let fatten p = p |*| up "[0,7,12,19]" |*| gain "0.9"
+    d1 $ stack [rhythm, fatten $ bass]
+
+    do
+      let houseTempo = 140
+      let tempoToCyclesPerSecond tempo = tempo/120
+      cps $ tempoToCyclesPerSecond houseTempo
+      let bassDrum = s "[bd bd]"
+      let bassLine = s "[bass:3*4]"
+      let percussion = s "[[~ sn:3], [~ hh]*2]"
+      let mainLoop = stack [bassDrum, bassLine, percussion]
+      d1 $ mainLoop

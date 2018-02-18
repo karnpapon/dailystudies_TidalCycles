@@ -1,0 +1,289 @@
+
+do
+    let pat rotation noteno = rotL rotation $ n ("0*8" + ( 4 <~ (discretise (1/16) $ choose harmonicMinor)))
+                # velocity (slow 16 $ sine)
+                # dur (slow 17 $ scale 0.25 1 $ sine)
+                |+| n noteno
+        pattern scale = stack [pat 0 0, pat 111 (-12), pat 222 (-24), pat 333 (-36)] |+| n scale
+    m1 $ pattern (discretise (1/16) $ "0 -12 -24")
+
+  cps 0.5
+
+  let shiftOctave = 1
+
+  let pattern rotation notenumber = rotL rotation
+              $ n ("0*8" + (4 <~ (discretise (1/16) $ choose harmonicMin))) |+|n notenumber
+      patternNote noteScale = stack[pattern 111 (-6), pattern 222 (-24), pattern 333 (-32)]
+              # velocity(slow 16 $ scale 0.3 1 $ sine)
+              #dur(slow 16 $ scale 0.25 1 $ sine)
+              |+|n noteScale
+
+  m1 $ patternNote (discretise (1/16) $ "0 -12 -24")
+
+m1 silence
+
+let pattern rotation notenumber = rotL rotation $ n ("0*8" + (4 ~> (discretise(1/16) $ choose harmonicMin)))
+            |+|n notenumber
+    chpattern nscale = stack[pattern 0 0,pattern 100 (-12),pattern 300 (-24)]
+            #velocity(0.01)
+            #dur(slow 16 $ sine)
+            |+|n nscale
+
+m1 $ chpattern (discretise (4) $ "-12 -24")
+
+let patternBass = "{1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~}"
+
+d1 $ stack [
+struct patternBass $ sound "jvbass" #up "-1" #cutoff 600,
+slow 2 $ sound "teks:1"
+]
+
+let kick =  "[1 ~ ~ 1] [1 ~ ~ 1] [1 1 ~ 1] [~ 1 ~ 1]"
+    snare = "[~ ~ ~ ~] [~ 1 ~ ~] [~ ~ ~ ~] [1 ~ ~ ~]"
+    mute = (const $ sound "")
+
+d2 $ stack [
+struct kick $ sound "bd",
+struct snare $ sound "sn",
+sound "supergong(5,8)",
+sound (samples "hang*16" (irand 15))#up "1"
+]#orbit 1
+
+m2 $ note (choose cscale)
+#nudge 0.16
+#dur 2
+
+bps(65/120)
+
+---------------------------------------------------------------------------
+do
+  let fluxSpace p = spaceOut ([1,0.95..0.2] ++ [0.25,0.3..1]) p
+      pat rotation nscale = rotL rotation $ fluxSpace $ n ("0*8" + (4 <~ (discretise (18) $ choose hirajoshi)))
+            |+|n nscale
+      mergpattern notescale = stack[pat 0 0, pat 0 (-12), pat 0 (-24)]
+            #velocity(slow 16 $ scale 0.25 1 $ sine)
+            #dur(slow 16 $ sine)
+            |+|n notescale
+  m1 $ mergpattern (discretise (1/4) $ "0 12")#nudge 0.25
+  d1 $ fluxSpace $ density 2 $ sound (samples "hang:1*4" (irand 20))#coarse 4 #cut 1
+
+m1 silence
+
+cps 0.5
+
+do
+  m1 silence
+  m2 silence
+  d1 $ silence
+
+m2 silence
+
+
+do
+d1 $ density 2 $ space $ sound "bd*4"
+m1 $ density 2 $ mergpattern (discretise (1) $ "0 -12")#nudge 0.20
+
+
+vd1 $ density 2 $ space $ f "{0.7 0.23 0.4 1}%4"
+
+let b = "{1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~}"
+
+d2 $ struct b $ sound "jvbass" #up "-1"
+
+d2 silence
+
+d1  $ foldEvery[2,3] (density 2) $ sound (samples "hang([2,8]/1,8)" (irand 30)) #up "1" #orbit 1 #gain 0.8
+
+m1 $ struct "1*16" $ n (choose minPent) |+|n "gs5" #nudge 0.30 #velocity 0.3
+
+m1 silence
+
+m2 $ n "0*8"
+
+m2 silence
+
+bps (65/120)
+
+cps 0.5
+
+cps(-1)
+cps 1
+
+
+d1 $ struct "1([5,6]/1,8)" $ sound (samples "percele*4" (irand 15)) #cut 5
+
+
+let space p = spaceOut ([1,0.95..0.2]++[0.25,0.3..1]) p
+    pattern rotation nscale = space $ rotL rotation $ n ("0*8" + (4 ~>(discretise (1/16) $  choose hirajoshi )))
+        |+|n nscale
+    mergePat nsc = stack[pattern 0 0, pattern 0 (-12), pattern 0 (-24)]
+        #velocity(slow 8 $ scale 0.25 1 $ sine)
+        #dur(slow 8 $ sine)
+        |+|n nsc
+
+
+let mute = (const $ sound "~")
+
+d1 $ space $ sound "bd:6*8"
+
+m1 $ mergePat (discretise (1/16) $ "0 -24") #nudge 0.26
+
+m1 silence
+
+do
+  d1 $ sound "bd"
+  m1 $ midinote "60"
+
+hush
+
+
+bps(65/120)
+
+cps 1.0
+
+let b = "{1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~}"
+
+d1
+$ stack[
+struct b
+$ sound "bass3:2"
+#up "-1"
+#sustain 0.7
+#rel 2
+#cutoff 1000,
+sound "teks:1/2"
+]
+
+let k = "[1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1]"
+    s = "[~ ~ ~ ~] [~ ~ ~ ~] [~ 1 ~ ~] [~ ~ 1 ~]"
+
+d2
+$ stack [
+struct k $ sound "bd",
+struct s $ sound "percele:4",
+sound "supergong(5,8)",
+whenmod 8 6 (#crush "{5 3 2}%4")
+$ foldEvery[2,3,4] (#coarse 5)
+$ every 4 (density 2)
+$ sound (samples "hang*16" (irand 10))
+#up"1"
+#gain 0.75
+]
+
+
+d1  $ fast "<4 3 2>" $ sound "bd"
+
+d2 $ stripe 2 $ sound "sd*4"
+
+d2 silence
+
+
+d2 silence
+
+bps (160/120)
+
+let mute p = (const $ sound "") p
+
+d1 $ foldEvery[2,3](stut (1)(0.125/2)(0.125)) $ (666 ~>)
+$ stack [
+every 2 (struct "1([3 5 7]/3,16)") $ sound "~ smash [smash ~] ~",
+every 2 (chop 4)
+$ slow 4
+$ stut' (4)(0.125*2)((#coarse "<5 4 2>").(|+|pan (sine) ))
+$ degradeBy 0.3
+$ sound (samples "stabfx*4" (irand 15)) #cut 4,
+degradeBy 0.4
+$ density 2
+$ sound (samples "akuma5*8" (irand 10))
+#unit "c"
+#speed 8,
+(#pan (fast 4 $ sine))
+$ whenmod 8 4 ((#unit "c").(#speed 8).(struct "1([3 7]/5,16)")) $ sound "hh*16"
+#shape 0.35,
+mute
+$ every 4 (density 2)
+$ sound (samples "halo*16" (irand 10))
+#gain 0.86
+#up "-1"
+]
+
+d1 silence
+
+d1 $ spaceOut (map (0.5*) [1,1.1..2]) $ sound "cp*4"
+
+d1 $ spaceOut [0.5,0.55..1] $ sound "cp*4"
+
+d1 $ spaceOut [1,1.5..10] $ sound "cp*4"
+
+bps(160/120)
+
+cps 1
+
+let pattern rotation nscale = rotL rotation $ n ("0*8" +  (4 ~> (discretise (1/16) $ choose hirajoshi)))|+|n nscale
+    mergepattern notescale = stack[pattern 100 (-12),pattern 200 (-24)]
+            #velocity(slow 16 $ scale 0.25 1 $ sine)
+            #dur(slow 16 $ sine)
+            |+|n notescale
+
+m1 $ mergepattern (discretise (1/16) $ "0 -12")
+
+m2 $ whenmod 8 4 (|=|midinote "66") $ midinote "64" #velocity (slow 16 $ scale 0.25 1 $ sine) #dur 8
+
+m1 silence
+
+
+bps (65/120)
+
+let pat = "1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~"
+    inverse "1 ~" = "~ 1"
+    inverse "~ 1" = "1 ~"
+
+d1 $ stack [
+ struct pat $ sound "bass3:2",
+ struct (inverse <$> pat) $ sound "sn"
+]
+
+
+do
+ d1 $ s "808oh:0" # pan (fast 1.00001 rand)
+ d2 $ s "808oh:1" # pan rand #gain 0.7
+
+ d1 $ s "808oh:0" # pan rand
+ d2 $ s "808oh:1" # pan rand
+
+
+let k = "[1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1]"
+    s = "[~ ~ ~ ~] [1 ~ ~ ~] [~ ~ ~ ~] [1 ~ ~ ~]"
+
+bps(65/120)
+
+d2 $ stack [
+struct k $ sound "bd*2",
+struct s $ sound "percele:4",
+sound (samples "hang*8" (irand 15)) #up "1",
+sound "supergong(5,8)"
+]
+
+let b = "{1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~}"
+
+d1 $ struct b $ sound "bass3:2"
+#up "-1"
+#sustain 0.7
+#rel 2
+#cutoff 1000
+-- #shape 0.4
+
+m2 $ spaceOut ([1.0,0.95..0.2]++[0.25,0.3..0.95]) $ every 4 (rev)
+$ whenmod 8 4 (#accelerate "-1")
+$ every 4 (|=|midinote (choose (map (24+) (customscale))))
+$ foldEvery[3,4] (|=|midinote (choose (customscale)) )
+$ midinote (choose (map (12+) (customscale)))
+#velocity(slow 16 $ sine)
+#dur (choose [12,8,2,4,0.5,0.25,0.125])
+#attack (rand)
+#nudge 0.25
+
+m2 silence
+
+
+d1 $ midinote "{32 ~ 39}/2" # sound "supersaw"

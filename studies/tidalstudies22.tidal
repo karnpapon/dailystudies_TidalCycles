@@ -1,0 +1,4 @@
+
+-- "do" can use inline
+d1 $ do s <- choose [0, 0.25, 0.5, 0.75]
+        within (s,s+0.25) (hurry 2) $ sound "arpy*8"

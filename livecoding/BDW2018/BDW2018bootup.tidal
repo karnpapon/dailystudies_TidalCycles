@@ -1,0 +1,84 @@
+import Sound.Tidal.MIDI.Context
+-- import Sound.Tidal.MIDI.MySynth
+
+devices <- midiDevices
+
+displayOutputDevices >>= putStrLn
+
+
+-- m1 <- midiStream devices "IAC Driver Tidal1" 1 mySynthController
+
+m1 <- midiStream devices "IAC Driver Tidal1" 1 synthController
+m2 <- midiStream devices "IAC Driver Tidal2" 1 synthController
+
+---------------------------------------------------------------------
+
+import Sound.Tidal.Scales
+
+---------------------------------------------------------------------
+
+
+-- manual easily writing function in Tidal/Haskell.
+add :: Integer -> Integer
+add x = x + 0
+add 11
+
+---------------------------------------------------------------------
+
+-- import Sound.Tidal.Stream
+-- import Sound.Tidal.Pattern
+-- import Sound.Tidal.Parse
+import Sound.Tidal.OscStream
+-- import Sound.Tidal.Context
+-- import Sound.Tidal.Params
+
+
+veda = Shape {
+  params = [
+    F "f" (Just 0.5)
+  ],
+  cpsStamp = False,
+  latency = 0.1
+}
+
+vedaSlang = OscSlang {
+  path = "/foo",
+  timestamp = NoStamp,
+  namedParams = False,
+  preamble = []
+}
+
+vedaStream = do
+  vd <- makeConnection "127.0.0.1" 4000 vedaSlang
+  stream (Backend vd $ (\_ _ _ -> return ())) veda
+
+
+f = makeF veda "f"
+
+vd1 <- vedaStream
+
+vd1 $ f "{0.23 0.75 0.56 0.34}%6"
+
+vd1
+$ f (slow 16 $ sine)
+
+vd1 silence
+
+cps 0.5
+
+
+--------------------------
+
+let eflatpenta = [3,6,8,10,1,15]
+    harmonicMin = [0,2,3,5,7,8,11]
+    cscale = [0, 5, 7, 10, 15]
+    customscale = [34,36,38,39,41,43,44]
+    -- customscale = [as2,c3,d3,ds3,f3,g3,gs3]
+
+
+bps (65/120)
+
+cps 0.5
+
+-- NOTE: midi nudge start from 0.16 then 0.25 will perfectly synced with audio track!!!!
+-- NOTE: open Veda first and new window for live coding to separate eval scope.

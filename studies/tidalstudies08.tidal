@@ -22,8 +22,8 @@ $ every 4 (spread ($) [slow 2, (# speed "0.8")])
 $ foldEvery [2,4] ((rip 8 0.25 0.5).(|=|crush "5"))
 $ every 2 (gap 16)
 $ stack[
-sound "name([3 5 7]/3,16)" # n npat,
-slow 2 $ (|+| n "1") $ sound "~ name [~ name] ~" # n npat,
+sound "smash([3 5 7]/3,16)" # n npat,
+slow 2 $ (|+| n "1") $ sound "~ smash [~ smash] ~" # n npat,
 degradeBy 0.3 $ density 2 $ mash "akuma5*8",
 every 2 (chop 4) $ slow 2 $ rep 6 $ sound "stabfx"
     # n (irand 12)

@@ -1,0 +1,72 @@
+d1 silence
+
+
+let fluxSpace = spaceOut ([1,0.95..0.2]++[0.25,0.3..0.9])
+
+let pattern rotation notenumber = rotL rotation $ fluxSpace  $ n ("0*8" + (4 ~> (discretise (8) $ choose hirajoshi)))|+|n notenumber
+    mergePattern nscale = stack[pattern 0 0, pattern 0 (-12), pattern 0 (-24)]
+      #velocity(slow 16 $ scale 0.25 1 $ sine)
+      #dur(slow 16 $ scale 0.25 1 $ sine)
+      |+|n nscale
+
+m1 $ mergePattern ( discretise (4) $ "2 12") #nudge 0.25
+
+
+m1 silence
+
+d1 silence
+
+
+bps(65/120)
+
+let patternBass = "{1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~}"
+
+d1 $ stack [
+struct patternBass $ sound "jvbass" #up "-1",
+sound "teks"
+]
+
+let k = "[1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1]"
+    s = "[~ ~ ~ ~] [~ ~ ~ ~] [1 ~ ~ ~] [1 ~ ~ ~]"
+
+d2  $ every 4 (#density 2) $ stack [
+struct k $ sound "bd",
+struct s $ sound "percele:4",
+every 2 (density 4)
+$ sound (samples "hang*16" (irand 15))
+#cut 1
+#up "1"
+]#orbit 1
+
+d2 silence
+
+
+let mute = (const $ sound "~")
+
+bps(140/120)
+
+d1 $ every 2 (rev) $ stack [
+mute $ struct "1 ~ ~ 1 ~ ~ " $ sound (samples "smash*4" (irand 15)),
+whenmod 8 4 (#coarse 5)
+$ degradeBy 0.2
+$ every 2 (density 4)
+mute $ sound (samples "akuma5*16" (irand 15)),
+mute $ sound "hh*32" #shape 0.5
+#unit "c"
+#speed (choose [(-2),2,8,6,5,(-4)])
+]
+
+
+d1 silence
+
+
+
+d1 $ whenmod 8 4 (#up "-6")
+$ every 4 (jux (#resonance (slow 8 scale 0.25 0.5 $ sine1)))
+$ striate' 36 (0.125)
+$ sound "khan" #cutoff (slow 8 $ (scale 0.02 0.95 sine1 * 8000)) #crush (choose [5,6,7,8,2.5,1])
+
+
+
+
+d1 silence

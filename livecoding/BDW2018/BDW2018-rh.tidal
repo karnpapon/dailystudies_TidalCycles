@@ -1,0 +1,250 @@
+-- intro
+
+do
+    let pat rotation noteno = rotL rotation $ n ("0*8" + ( 4 <~ (discretise (1/16) $ choose hirajoshi)))
+                # velocity (slow 16 $ sine)
+                # dur (slow 17 $ scale 0.25 1 $ sine)
+                |+| n noteno
+        pattern scale = stack [pat 0 0, pat 111 (-12), pat 222 (-24), pat 333 (-36)] |+| n scale
+    m1 $ pattern (discretise (1/16) $ "0 12 24")
+
+  cps 0.5
+
+m1 silence
+
+  let pat rotation notenum = rotL rotation $ n ("0*8" + (4 <~ (discretise (1/16) $ choose harmonicMin) )) |+|n notenum
+      pattern noteScale = stack[pat 0 0,pat 111 (-12), pat 222 (-32)]
+              #velocity (slow 16 $ scale 0.25 1 $ sine)
+              #dur (slow 17 $ sine)
+              |+|n noteScale
+
+m1 $ pattern (discretise (2) $ "0 12 24" )
+
+m2
+$ struct "{1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~}/2"
+$ n (scaleP "harmonicMinor" (irand 7))
+# dur 2
+
+m2 silence
+
+
+
+-- movement 1
+
+bps (65/120)
+
+let patternBass = "[1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~]"
+
+vd1 $ every 4 ( density "2" ) $ f patternVj
+
+vd1 silence
+
+d1 $ every 4 (density 4)$ struct (patternBass) $ sound "bd sn teks"
+
+d1
+$ stack[
+struct (patternBass) $ sound "jvbass"
+#up "-1",
+slow 2 $ sound "[teks]"
+-- every 2 (#speed 2)
+-- $ degradeBy 0.6
+-- $ foldEvery [3,4] (rev)
+-- $ every 4 (density 4)
+-- $ note (scaleP (choose ["augmented", "diminished"]) (run "{4 6 8 16}"))
+-- # s "superpiano"
+-- |=|gain 0.7
+]
+#orbit 0
+
+
+let kick = "[1 ~ ~ 1][1 ~ ~ 1][1 1 ~ 1][~ 1 ~ 1]"
+    snare ="[~ ~ ~ ~][1 ~ ~ ~][~ ~ ~ ~][1 ~ ~ ~]"
+
+d2 $ stack [
+gain (kick) # sound "bd",
+gain (snare) # sound "sn",
+every 4 (rev) $ every 2 (density 2 ) $ sound "supergong(5,8)",
+foldEvery[3,4] (#coarse "{2 3 5}") $
+every 4 ( density "1" ) $
+sound (samples "hang*16" (irand 20))
+# up "1"
+]#orbit 1
+#room 0.2
+#gain 0.8
+
+
+
+let k =  "[1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1] [1 ~ ~ 1]"
+    s =  "[~ ~ ~ ~] [1 ~ ~ ~] [~ ~ ~ ~] [1 ~ ~ ~]"
+    b =  "[1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 ~]"
+
+d1 $ struct (b) $ sound "jvbass"
+# up "-1"
+
+d2 $ stack [
+struct (k) $ sound "bd",
+struct (s) $ sound "sn",
+every 4 (slowspread ($) [rev, (#accelerate "-1 2"), (density 2)]) $
+sound "supergong(5,8)",
+foldEvery[3,4](#coarse "2 3 5") $
+every 4 (density "1 2") $
+sound (samples "hang*16" (irand 15))
+#up "1"
+-- #orbit 1
+]
+
+
+let mute p = (const $ sound "") p
+
+d2 silence
+
+bps (90/120)
+
+-- movement 2
+
+d1
+$ every 2 (jux (#accelerate "-0.1"))
+$ every 8 (spread ($) [(|=|speed 2), (striate 4)])
+$ every 4 (chop 2)
+$ someCyclesBy 2 (density 2)
+$ every 4 (striate' 3 0.25)
+$ stack [
+sound (samples "smash*8" (irand 5)),
+every 4 (chop 2) $ sound "supermandolin*8" |=| release 1,
+sound (samples "rammer*8" (irand 16)) #cut "1"
+#gain 0.85
+]
+
+t1 (xfadeIn 2) $ every 2 (density 2) $ sound (samples "smash*8" (irand 5))
+
+d1 silence
+
+-- movement3
+
+let npat = "[0 2 4 6]/16"
+
+
+bps(140/120)
+
+d1
+$ every 6 (shift' 0.25)
+$ every 4 (spread ($) [slow 2, (# speed "0.8")])
+$ foldEvery [2,4] ((rip 8 0.25 0.5).(|=|crush "5"))
+$ every 2 (gap 16)
+$ stack[
+sound "smash([3 5 7]/3,16)" # n npat,
+slow 2 $ (|+| n "1") $ sound "~ smash [~ smash] ~" # n npat,
+degradeBy 0.3 $ density 2 $ mash "akuma5*8",
+every 2 (chop 4) $ slow 2 $ rep 6 $ sound "stabfx"
+    # n (irand 12)
+    # cut "3"
+    # shape "0.4"
+]
+
+let mute = (const $ sound "")
+
+d1 $ foldEvery[2,3](666 ~>)
+$ stack [
+every 2 (chop 4)
+$ slow 4
+$ stut' (4)(0.125*3)(|=| crush 4)
+$ sound (samples "stabfx*4" (irand 15))
+#cut 3
+#shape 0.2,
+degradeBy 0.3 $ density 2 $ sound (samples "akuma5*8" (irand 15)) #unit "c" #speed 8,
+slow 2 $ struct "~ 1 [~ 1] ~" $ sound "smash",
+whenmod 8 4 ((#unit "c").(#speed 8)) $ sound (samples"hh*16" (irand 15))#cut 5 #shape 0.4
+]
+
+d1 silence
+
+d1 $ degradeBy 0.3 $ density 2 $ sound (samples "akuma5*8" (irand 30))#unit "c" #speed 8
+
+-- movement4
+
+let mute = (const $ sound "")
+
+bps (120/120)
+
+d1  $ whenmod 8 4 (|=| up "-6") $ stack [
+every 2 (linger 0.125)
+$ striate' 32 (0.125)
+$ every 4 (jux (#resonance (sine1)))
+$ sound "khan"
+#shape 0.4
+# cutoff (slow 8 $ (scale 0.05 0.95 sine1 * 8000))
+# gain 0.5,
+density 2 $ sound "bd*2 ~" #cutoff (slow 2 $ scale 700 2000 $ sine1) |=|gain 1 |=|pan (slow 2 $ tri),
+sound "~ [supergong*2] ~ {supergong}"
+]
+|=| up "-8"
+
+
+d1 $ whenmod 8 4 (|=|up "-6")$ every 2 (linger 0.125)
+$ striate' 32 (0.125)
+$ every 4 (jux (#resonance sine1))
+$ sound "khan"
+# cutoff (slow 8 $ (scale 0.05 0.95 $ sine1 * 8000))
+#up "-8"
+#shape 0.3
+#crush (choose [1,0.5,2,2.5,6])
+#velocity (slow 16 $ sine)
+
+d2 $ sound "{~ smash}%4"#shape 0.8 #orbit 1
+
+d2 silence
+
+d2 $ whenmod 8 4 (|=|midinote "{34 _ 41}/2")
+$ midinote "{32 _ 39}/2" # sound "supersaw"
+-- |=| cutoff 400
+#shape 0.5
+#dur 1
+#orbit 1
+|=| release 5
+
+t1 (xfadeIn 4) $ sound "bd*2 ~" #cutoff (scale 150 1000 $ sine1) |=|gain 1
+
+m1
+$ every 2 palindrome
+$ every 4 (density 2) $ note (choose eflatpenta) #nudge 0.29
+
+m1 silence
+d1 silence
+
+
+
+--
+-- bps (120/120)
+-- cps 0.5
+--
+--
+-- m2 $ (200 ~>)
+-- $ every 4 (degradeBy 0.5)
+-- $ whenmod 8 4 (density 32)
+-- $ foldEvery[3,4](density 16)
+-- $ every 3 (#accelerate "-1")
+-- $ note (scaleP "eflatpenta" (irand 7) )
+-- #dur(choose[4,2,1,0])
+--
+-- m2 silence
+--
+--
+-- let chromaticSc = "0 1 2 3 4 5 6 7 8 9 10 11"
+--
+--
+-- m1 $ struct "0*8" $ n $ shuffle 8 (harmMinor)
+--
+-- m1 silence
+--
+-- m2 $ slow 2 $ zoom (0,8/12) $ n $ shuffle 12 chromaticSc
+--
+-- cps 0.5
+--
+-- m1 silence
+-- m2 silence
+
+vd1 $  every 4 (density 4) $ f "{0.7*4 0.23 0.4 1}%8"
+
+vd1 silence
+
+d1 $ every 4 (density 4) $ sound "{bd*2 sn teks ~ 808}%8"

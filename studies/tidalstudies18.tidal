@@ -1,0 +1,49 @@
+-- exploring
+-- 1. send data via OSC to fragment .
+
+-- new learned function
+-- 1. none.
+
+---------------------------------------------------------------------
+
+import Sound.Tidal.Stream
+import Sound.Tidal.Pattern
+import Sound.Tidal.Parse
+import Sound.Tidal.OscStream
+import Sound.Tidal.Context
+import Sound.Tidal.Params
+
+
+fragment = Shape {
+  params = [
+    F "f" (Just 0.5)
+  ],
+  cpsStamp = False,
+  latency = 0.0
+}
+
+fragmentSlang = OscSlang {
+  path = "/params/circSpeed",
+  timestamp = NoStamp,
+  namedParams = False,
+  preamble = []
+}
+
+fragmentStream = do
+  fr <- makeConnection "127.0.0.1" 10001 fragmentSlang
+  stream (Backend fr $ (\_ _ _ -> return ())) fragment
+
+f = makeF fragment "f"
+
+f1 <- fragmentStream
+
+d1 $ sound "bd burnch sd [tek tek]"
+
+f1 $ f "0.2 0.345 0.55 [0.21 0.87] ~"
+f1 $ f "0.0"
+-- f1 $ f "0.3851"
+
+d1 silence
+f1 silence
+
+d1 $ sound "bd*4"

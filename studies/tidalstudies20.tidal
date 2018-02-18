@@ -1,0 +1,55 @@
+d1 $ slow 4 $ stack [
+   s "superpiano*12" # n ((run 12)+0) # gain (scale 0.5 1.1 saw),
+   s "superpiano*12" # n ((run 12)+12) # gain "1",
+   s "superpiano*12" # n ((run 12)+24) # gain (scale 0.5 1.1 rev $ saw)
+] # attack "0.1" # release "0.2"
+
+----- from jarm
+
+do
+  let roots = "<c e [a g _ _] f>"
+  let chords = "<major minor [minor major _ _] major>"
+  cps (120/120)
+  t1 (j 0) . jux (> ac 0.03)
+    . sl 2 . str 4 . iter 4
+    $ stack [
+        up' (arpChordProg roots chords
+             (saw * "<8 12>" + ssinf 0 4 8)
+             (sl 4 $ "x(17,32)")
+        ) > s "moog" > adsr "0:1:1:0.5" > go "0.8:0"
+        > lpf' (ssinf 1e3 5e3 0.125) 0.4
+        ,up' (chord chords + roots - 36) # s "ldbrass" > go "0.7:2" > end "0.1" -- > octave "4"
+        ,n (struct "x*4" (roots - 18)) > s "bspluck" > go "0.7:4" > end "0.2" > pan (sinf 0.125)
+      ]
+    > del' 0.2 (ssinf 0.1 0.4 0.125) 0.4
+
+
+
+    ----- from efairbank
+
+import Sound.Tidal.Chords
+import Sound.Tidal.Utils
+
+contToPat  n p = round <$> discretise n p
+contToPat' a b = round <$> struct a b
+c2p  = contToPat
+c2p' = contToPat'
+
+scaleP' :: Pattern [Int] -> Pattern Int -> Pattern Int
+scaleP' sp p = (\n scalePat -> noteInScale scalePat n) <$> p <*> sp
+   where octave s x = x `div` (length s)
+         noteInScale s x = (s !!! x) + (12 * octave s x)
+
+chordProg roots chords = (\x l -> fmap (+ (x)) l) <$> roots <*> chordL chords
+arpChordProg roots chords arplfo rhythm = scaleP' (chordProg roots chords) (c2p' rhythm arplfo)
+
+up' p = up (fmap fromIntegral p)
+
+do
+  cps (-1)
+  cps (120/120)
+  d1 $ when (\x -> x > 16) (|*| gain 0) $ stut 4 0.3 1 $
+    up' ( arpChordProg "<c a f g e a d [b g]>" "<major minor major major minor minor minor [dim aug]>" ( slowcat ["[3 1 2 0]*2", saw*"<8 12>"]) "x(<8 8>*3,8)")
+    |*| speed "[1,2,4,8]" |*| s "moog" |*| release 0.4 |*| gain 0.5 # cutoff 3000
+
+hush

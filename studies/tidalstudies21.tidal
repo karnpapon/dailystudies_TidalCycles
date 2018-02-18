@@ -1,0 +1,57 @@
+-- exploring
+-- 1. random binary pattern with pseudo-random pattern.
+
+-- new learned function
+-- 1. loopFirst.
+
+-- from Slack (Tidal)channel.
+---------------------------------------------------------------------
+
+let pat = "[1 0 1 1]"
+
+d1 $ gain (discretise (4) $ loopFirst $ irand 2) # sound "bd"
+
+-- (irand 2) randomly pick up 0 and 1,
+-- using argument (t) to select another pattern("seed")
+-- (loopFirst) will forever loop the pattern (prevent the pattern for changing over the cycles).
+let binrand t = loopFirst $ t <~ (irand 2)
+
+d1 $ stack [
+gain (binrand 2) # sound "bd",
+sound"teks:2"
+]
+
+-- binrand 0
+d1 $ stack[
+struct "1 ~ ~ 1 1 1 1 ~ " $ sound "bd",
+sound "teks:2"
+]
+
+-- binrand 1
+d1 $ stack[
+struct "1 1 1 ~ ~ ~ ~ ~ " $ sound "bd",
+sound "teks:2"
+]
+
+-- binrand 2
+d1 $ stack[
+struct "1 1 ~ ~ 1 ~ ~ 1 " $ sound "bd",
+sound "teks:2"
+]
+
+-- binrand 3
+d1 $ stack[
+struct "~ ~ 1 ~ ~ ~ 1 1 " $ sound "bd",
+sound "teks:2"
+]
+
+-- use (degradeBy) to control density of pattern.
+do
+ let num = 9 -- the "seed"
+ let binrand t = loopFirst $ degradeBy 0.2 $ t <~ (irand 2)
+ let dnum = num
+ let hnum = num*2
+ d1 $ stack [
+        gain (discretise 8 $ binrand dnum) # sound "bd",
+        gain (discretise 8 $ binrand hnum) # sound "hh"
+        ]
