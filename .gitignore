@@ -1,5 +1,5 @@
-./from Slack:RocketChat
-./issues
-./modules
-./OSCulator
-./utils
+from Slack:RocketChat
+issues
+modules
+OSCulator
+utils
