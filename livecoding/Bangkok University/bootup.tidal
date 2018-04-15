@@ -1,0 +1,63 @@
+
+bps (65/120)
+
+cps 0.5
+
+import Sound.Tidal.MIDI.Context
+
+devices <- midiDevices
+
+displayOutputDevices >>= putStrLn
+
+
+m1 <- midiStream devices "IAC Driver Tidal1" 1 synthController
+
+---------------------------------------------------------------------
+
+import Sound.Tidal.Scales
+
+---------------------------------------------------------------------
+
+import Sound.Tidal.OscStream
+
+veda = Shape {
+  params = [
+    F "f" (Just 0.5)
+  ],
+  cpsStamp = False,
+  latency = 0.1
+}
+
+vedaSlang = OscSlang {
+  path = "/foo",
+  timestamp = NoStamp,
+  namedParams = False,
+  preamble = []
+}
+
+vedaStream = do
+  vd <- makeConnection "127.0.0.1" 4000 vedaSlang
+  stream (Backend vd $ (\_ _ _ -> return ())) veda
+
+
+f = makeF veda "f"
+
+vd1 <- vedaStream
+
+vd1 $ degradeBy 0.3 $ density 2 $ f "{0.23 0.75 0.56 0.34}"
+
+vd1 silence
+
+--------------------------
+
+let rip a b p = within (0.25, 0.75) (slow 2 . rev . stut 8 a b) p
+    rip' a b c d e p = within (a, b) (slow 2 . rev . stut c d e) p
+    up = speed . ((1.059466**) <$>)
+    shift p = (1024 <~)  p
+    shift' x p = (x <~) p
+    rep n p = stut' (n-1) (0.125*3) (|*| gain "1") $ p
+    rep' n p = stut' (n-1) (0.125/2*3) (|*| gain "1") $ p
+    rep'' n p = stut' (n-1) (0.125/4*3) (|*| gain "1") $ p
+
+-- NOTE: midi nudge start from 0.16 then 0.25 will perfectly synced with audio track!!!!
+-- NOTE: open Veda first and new window for live coding to separate eval scope.

@@ -1,4 +1,72 @@
+-- exploring
+-- 1. new function in Tidal 0.9.9 released.
+-- 2. changed latency of synthController.
+
+-- new learned function
+-- 1. e.
+-- 1. einv.
+-- 1. distrib.
+---------------------------------------------------------------------
+
+import Sound.Tidal.MIDI.Context
+
+devices <- midiDevices
+
+displayOutputDevices >>= putStrLn
+
+-- onboard soundcard Mac mid 2012, OS X 10.11.6
+-- latency between 0.320 ~ 0.325 is acceptable.
+m1 <- midiStream devices "IAC Driver Tidal1" 1 (synthController {Sound.Tidal.MIDI.Context.latency = 0.321})
+m2 <- midiStream devices "IAC Driver Tidal2" 1 (synthController {Sound.Tidal.MIDI.Context.latency = 0.320})
+
+---------------------------------------------------------------------------------------------
+
+
+------------ midi test for tidal-midi 0.9.10 ------------
+-- n is only accepted for note (temporary, Yaxu is currently working on).
+
+do
+  m2 $ n "0" -- 2 note plays euclideanly to (5,8)
+  d1 $ sound "bd:7"
+
+do
+  d1 silence
+  m2 silence
+
+--------------------------------------------------------------------
+
 
 -- "do" can use inline
 d1 $ do s <- choose [0, 0.25, 0.5, 0.75]
         within (s,s+0.25) (hurry 2) $ sound "arpy*8"
+
+
+d1 $ ur 16 "a b a:x c"
+ [("a",sound "bd"),
+  ("b",sound "sn"),
+  ("c",sound "cp")]
+ [('x', (# vowel "a"))]
+
+
+cps 1
+-- ur' create defined pattern with
+
+ d1 $ ur' 16 "a b a c"
+  [("a",sound "bd"),
+   ("b",sound "teks"),
+   ("c",sound "cp")
+  ]
+
+------------ new Function in Tidal 0.9.8 ------------
+-- sample is accepted floating val.
+d1 $ s "gltch*8" # n (sine)
+
+-- e = euclidean rhythm that give "structure" ex. "x - - x - - x ~"
+-- einv = inverted version of "e"
+d1 $ stack [
+e 3 8 $ sound "bd",
+einv 3 8 $ sound "hh"
+]
+
+-- 2 is euclideanly play in (5,8) rhythm.
+d1 $ distrib [2,5,8]$ sound "bd:7"
