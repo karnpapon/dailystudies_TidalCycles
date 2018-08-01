@@ -1,0 +1,46 @@
+-- IAC(midi)
+-- mdchan 0 = Arp
+-- 1 is manual.
+-- mdchan 1 = Classic Lead
+-- mdchan 2 = Chole
+-- mdchan 3 = Bass 
+
+-- SCARLETTE(midi2)
+-- mdchan 0 = bass
+-- mdchan 1 = arp
+-- mdchan 2 = lead
+-- mdchan 3 = 
+
+-- cc chan 3/51 = cutoff
+
+-- ----------------------------------
+
+-- spaceOut
+-- stut',struct,inside,zoom
+
+-- hiraj
+-- "[0,3,5,-2]/4"
+
+-- smash,stabfx,akuma5,moog,breaks125
+-- clubkick:5,bend,lighter,industrial:20,1
+
+-- ----------------------------------
+
+-- new shelter
+-- as4 cs4 gs4
+-- gs4 b4 d4 
+
+-- Lagoon
+-- e gs ds f
+-- d fs cs e 
+-- ////
+-- b d fs g b d fs g b d fs g b d e cs
+-- a cs e gs a cs e gs a cs e gs a cs e gs
+-- a cs e gs a cs e gs a cs e gs a cs e fs
+-- ////
+-- d2 a2 fs2
+-- fs3 d3 a3
+-- fs3 fs4 a4
+-- g3 d3 b3
+-- ----------------------------------
+

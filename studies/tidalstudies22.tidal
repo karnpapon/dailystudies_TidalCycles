@@ -16,8 +16,9 @@ displayOutputDevices >>= putStrLn
 
 -- onboard soundcard Mac mid 2012, OS X 10.11.6
 -- latency between 0.320 ~ 0.325 is acceptable.
-m1 <- midiStream devices "IAC Driver Tidal1" 1 (synthController {Sound.Tidal.MIDI.Context.latency = 0.321})
-m2 <- midiStream devices "IAC Driver Tidal2" 1 (synthController {Sound.Tidal.MIDI.Context.latency = 0.320})
+-- "Scarlett 2i4 USB" confirmed same latency.
+m1 <- midiStream devices "Scarlett 2i4 USB" 1 (synthController {Sound.Tidal.MIDI.Context.latency = 0.319})
+m2 <- midiStream devices "IAC Driver Tidal1" 1 (synthController {Sound.Tidal.MIDI.Context.latency = 0.320})
 
 ---------------------------------------------------------------------------------------------
 
@@ -26,12 +27,15 @@ m2 <- midiStream devices "IAC Driver Tidal2" 1 (synthController {Sound.Tidal.MID
 -- n is only accepted for note (temporary, Yaxu is currently working on).
 
 do
-  m2 $ n "0" -- 2 note plays euclideanly to (5,8)
+  m1 $ n "0"
+
+do
+  m1 $ n "0" -- 2 note plays euclideanly to (5,8)
   d1 $ sound "bd:7"
 
 do
   d1 silence
-  m2 silence
+  m1 silence
 
 --------------------------------------------------------------------
 
@@ -67,8 +71,24 @@ d1 $ stack [
 e 3 8 $ sound "bd",
 einv 3 8 $ sound "hh"
 ]
+d1 silence
 
 -- 2 is euclideanly play in (5,8) rhythm.
 d1 $ distrib [2,5,8]$ sound "bd:7"
-
+d1 silence
 --
+do
+  d1 $ distrib [2,5,8]$ sound "bd:7"
+
+  m1 $ distrib [4,5,8]$ n "c3"
+
+do
+  d1 silence
+  m1 silence
+
+
+m1 $ slow 4 $ n "c3"
+
+m1 $ n "c3/2"
+
+m1 silence

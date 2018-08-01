@@ -1,0 +1,21 @@
+
+let fluxx = spaceOut ([1,0.95..0.2]++[0.25,0.3..1])
+
+let pattern rotation noteScale = rotL rotation $ fluxx $ note ("0*8") |+|n noteScale
+    mergePattern notenumber = stack[pattern 0 0, pattern 0 (-12), pattern 0 (-24)]
+        #velocity(scale 0.25 1 $ sine)
+        #dur(scale 0.25 1 $ sine)
+        |+|n notenumber
+
+
+m1 $ mergePattern "2"
+
+m1 silence
+
+
+bps (140/120)
+
+
+d1 $ sound "bd"
+
+d1 $ sound "arpy*4"

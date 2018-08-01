@@ -1,11 +1,11 @@
 /*{
     frameskip: 1,
-    "audio": false,
+    "audio": true,
     "vertexMode": "TRIANGLES",
     // "vertexMode": "POINTS",
     PASSES: [{
       // "fs": './myshader.frag',
-      OBJ: './model/deer.obj'
+      OBJ: './model/statue.obj'
     }]
 }*/
 precision mediump float;
