@@ -1,0 +1,12 @@
+---------------------------INITIAL HEADER-----------------------------
+bps(65/120)
+
+displayOutputDevices >>= putStrLn
+
+devices <- midiDevices
+
+m1 <- midiStream devices "IAC Driver Tidal1" 1 synthController
+m2 <- midiStream devices "IAC Driver Tidal2" 1 synthController
+
+----------------------------------------------------------------------
+

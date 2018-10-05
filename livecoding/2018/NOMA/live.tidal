@@ -1,0 +1,75 @@
+let mute = const $ sound "~"
+
+cps 0.4
+
+d1 $ whenmod 6 5 (#sound (samples "industrial:5*4" (irand 20)))
+$ stack [
+  mute $ slow 2
+  $ sound (samples "stabb*4"  (irand 20))
+  #cut 1,
+  mute $ struct "1 ~ [1 ~]"
+  $ sound "smash",
+  degradeBy 0.7
+  $ density 2
+  $ sound (samples "akuma5*8" (irand 15))  
+  #unit "c"
+  #speed  8
+]
+
+d2 $ sound "hh" #unit "c" #speed 4
+
+d1 silence
+
+
+d2 silence
+
+
+cps 0.6
+
+d1 $ stack [
+  mute $ midinote ( "[{ 0 4 7 11}%24 ]/ 2" + 48 + "[1 1]/11" ) 
+  # sound "customSynth02"
+  #octave ( wchoose [1,8,1] [4,5,6] )
+  #sustain 1.1,
+  mute $ midinote (54) # sound "midi" #midichan 3,
+  mute $ stack [
+    sound "bend/2" # speed 2,
+    sound "industrial:20/5" ,
+    sound "lighter"
+  ]
+  #gain 0.7
+  #orbit 1
+  #room 1
+  #size (slow 16  $ scale 0.9  0.95  $ sine)
+]  
+
+
+
+
+oneshot d1 $ sound  "khan"
+
+
+d1 $ stack [
+  mute $ whenmod 8 4 (#note  "{ as4 cs4 gs4 }%8")
+  $ every 2 (density 2 )
+  $ note "{ gs3 b4 ds4 }%8"
+  #octave (choose [4,5,6])
+  #sustain 1.1
+  #shape 0.5
+  # sound "customSynth02",
+  mute $ struct "1(3,8)"
+  $ sound "clubkick:5" #cutoff 700,
+  whenmod 8 4 (#up "-6")
+  $ sound "khan" 
+  #orbit 1
+  #up "-8"
+  #gain 0.5
+  #end 0.3
+  #room 1
+  #size (slow 16  $ scale 0.9  0.95  $ sine)
+]
+
+
+
+d1 $ silence
+

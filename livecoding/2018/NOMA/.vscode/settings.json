@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.tidal": "haskell"
+  },
+  "tidalcycles.ghciPath": "ghci",
+  "editor.mouseWheelZoom": true,
+}

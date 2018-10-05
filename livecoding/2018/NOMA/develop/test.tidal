@@ -1,0 +1,417 @@
+
+do
+  bps (160/120)
+  let modbeat = 16 
+  let modtime = 12
+  let customNotes = "{~ 0 0 7 14 12 14 ~ ~ }%16"
+  let customNotes2 = "{19 ~ 14 12 14 7 0 0 ~}%16"
+  let customNotes3 = (toScale Scales.harmonicMinor (run  12 ))
+  let mute = const $ sound "~"
+  d1 
+    $ whenmod 12 10 ( |+|note 12 )
+    $ (123 ~>)
+    $ whenmod 10 5 ((|+|note (customNotes)).(|=|note (choose [0,12])) )
+    $ foldEvery [3,4] (slow (wchoose [7,7,6,3] [2,4,6,8]))
+    $ whenmod modbeat modtime ( always (stut' 3 (choose [0.125,0.125*3]) (|+|note (choose [ -12, 24 ])))) 
+    $ often (stut' (choose [1,2,3]) (choose [0.125,0.125*3]) (|+| note (choose [-12]))) 
+    $ whenmod modbeat modtime (|+|note 24)
+    $ ( whenmod modbeat modtime (|+|note 12)).(|+| note (choose [12,24,36])) 
+    $ whenmod 8 4 ( whenmod modbeat modtime ( #note (customNotes) )) 
+    $ stack [
+      every 3 (rev)
+      $ every 5 (( #sound (samples "stabb" (irand 5)) ).(#cut 2))
+      $ whenmod modbeat modtime (|+|note 3 )
+      $ note (customNotes)
+      # s "a4" 
+      # midichan 2,
+      (1 <~)
+      $ every 4 (density 4)
+      $ every 2 (density 4)
+      $ foldEvery [3,4] ( (density 2) . ((#note (customNotes)). ( #sound "a4" ).(  #midichan 3 ) )  ) 
+      $ sound "clubkick akuma5"
+      #cut 1
+      #gain 0.8
+      #room 1
+      #size (slow 16  $ scale 0.5  0.7  $ sine)
+    ]
+  d3
+    $ slow 6 $ note ("<d4 cs4>" + chord "minor7")
+    # sound "midi" #midichan 2 #velocity 0.5
+
+
+d2 $ off "<0.125 0.25>" ((#note "5").( #speed (1/2) )) $ sound "bass*4" #note "1" #speed 0.5
+
+d2 $ sound "{ [ bd bd ] [ hh hh hh hh ] }%3"
+
+d2 $ stack [
+  sound "akuma5:9(3,8)" #unit "c" #speed 7 ,
+  sound "hh*16"
+] 
+
+
+d1 $ sound "foley" #cut 1
+
+
+d2 silence
+
+
+d2 
+$ mute 
+$ whenmod 12 10 ( mute )
+$ whenmod 12 4 (|+|note 5)
+$ slow 2
+$ note "{ 5 ~ 4 ~ 0 ~ 2 ~ ~ ~ ~ }%4" 
+# sound "a4" 
+#midichan 2 
+#gain 1.2
+
+d2 silence
+
+off "<0.125 0.25>" ( (# n "5") . (# speed 0.5)) $ s "bass*4"
+
+do
+  bps (140/120)
+  d2 $     
+      every 3 (rev) $ density 2 $ every 2 (|+| note "12") $ (|+| note "-8") $ 
+      note "f4 a4 g5 f4 a4 g5" # s "customSynth02"#shape 0.5 #gain 1.1 #sustain 0.6
+
+
+let mute = const $ sound "~"
+      
+do
+  bps(80/120)
+  d1
+    $ stack [
+      note "{e4 c4 e5 g5 gs5 c5 e6 g6 gs6 g6 e5 c4}%32" 
+      # s "a4"
+      #midichan 0,
+      note "{ c4 }%16" # sound "a4" #midichan 2,
+      sound "{ bd:2*4 [ bd:2 bd:2 bd:2 ~ ] [ [ bd:2 ~ ~ sd ] ~ ~ ] [ bd:2 bd:2 bd:2 ~ ] [ [ bd:2 ~ ~ sd ] ~ ~ ] [ bd:2 bd:2 bd:2 ~ ] [ [ bd:2 ~ ~ sd ] ~ ~ ] bd:2*4 }%4 "
+    ]
+
+
+d1 $ off "0.125" ( (# n "10") . (# speed ( 1/3 ))) $ s "arpy*4"
+
+d1 $ note "10" # speed (1/3) # sound "arpy*4"
+
+
+d1 $ sound "midi" #midichan 2
+t1 (xfadeIn 2) $ sound "~" 
+
+
+d3 $ sound "midi" #midichan 3
+
+d3 silence
+
+d1 $ sound "bd*6"
+
+
+d4 $ sound "a4"
+#midichan 1
+#midicmd "control"
+#ctlNum 78 -- OSC2 Level
+#control 70
+
+d1 $ slow 2 $ striate' 12 0.25 $ sound "speechh" #unit "c" #shape 0.45 #speed ( 1/3 )
+
+d1 $ stack [ 
+    sound "a4" 
+    #midichan 2 ,
+    sound "a4" 
+    #midichan 1
+]
+
+
+d1 $ sound "bd"
+
+d1 
+$ sound "a4" 
+#midichan 3
+-- #midicmd "control" 
+-- #ctlNum 18
+-- #control 700
+
+d2 
+$ sound "a4" 
+#midichan 1
+#midicmd "control" 
+#ctlNum 18
+#control 100 
+
+d1 
+$ sound "a4"
+#midichan 1
+
+
+-- CC control only works when send to separated output(d1,d2,d3,etc.)
+d2 $ sound "a4"
+#midichan 1
+#midicmd "control" 
+#ctlNum 18
+#control 30 
+
+
+
+
+
+d1 $ sound "midi" #midichan 1
+
+d2 silence
+
+d2 
+$ note (toScale Scales.harmonicMinor (run 12 ))
+# sound "customSynth02"
+#shape 0.6
+
+d2 $ sometimesBy 0.3 (# midinote 3) $ (1 <~) $ speeds # midinote 66 # gain 1.1
+
+
+d2 
+$ note (toScale Scales.harmonicMinor (run 12)) 
+# sound "a4" #midichan 3
+
+d2 silence
+
+d1 $ sound "a4" #midichan 1
+
+d2 silence
+
+d2 $ slow 2 $ struct "1(3,5)" $ sound ( samples "hang" (irand 10) ) #up "-2" #shape 0.5
+
+d2 
+
+
+d1 
+  -- $ struct (randcat ["1 ~ 1 ~ ~ 1" , "! 1 1 ~ ~ 1", "1(3,8)"] )
+  $ note "[0,10]/2"
+  # sound "a4" #midichan 2
+
+replicate 5 "a4*1"
+
+randcat ( ( "1 1 1" ) ++ ( "1 ~ 1" ) )
+
+d2 $     
+    every 3 (rev)  $ every 2 (|+| note "12") $ (|+| note "-8") 
+    $ note (toScale Scales.hexMajor6 (run ( 12 ))) # s "a4" # midichan 0 
+
+
+d2 $ note "0 4 7 11 12 16 19 23" # sound "a4" 
+
+
+let speeds = slow (discretise 1 $ choose [1,1,1,2,2]) $ degradeBy 0.4 $ (1 <~) $ s (randcat( 
+                    (replicate 5 "a4*1") 
+                    ++ (replicate 5 "a4*2") 
+                    ++ (replicate 5 "a4*3") 
+                    ++ (replicate 5 "a4*4") 
+                    ++ (replicate 10 "a4*5") 
+                    ++ (replicate 10 "a4*6") 
+                    ++ (replicate 7 "a4*7") 
+                    ++ (replicate 8 "a4*8") 
+                    ++ (replicate 10 "a4*10") 
+                    ++ (replicate 10 "a4*12") 
+                    ++ (replicate 10 "a4*14") 
+                    ++ (replicate 10 "a4*16") 
+                    ++ (replicate 10 "a4*18") 
+                    ++ (replicate 10 "a4*20") 
+                )) #midichan 0
+
+
+
+d1 $ whenmod 8 4 (sometimesBy 0.7 (fast 2)) $ sometimesBy 0.4 (fast 2) $ sound "bd*8"
+
+rarely
+
+-- convert pattern double to double from RocketChat.
+d1 $ do x <- (slow 8 $ scale 0.1 0.7 saw1)
+        somecyclesBy x (fast 2) $ sound "bd*16"
+
+-- d2 $ stack [
+--   sound ( samples "hh*4" (irand 20) )
+-- ]
+
+d2 $ slow 2 $ note "0 [~ 2] ~ -3 [~ 2] ~ [~ 5]/2 [~ 7]/2" # s "midi" # midichan 0 # sustain 0.1
+
+d3 $ (|*| gain 0.9) $ move $ whenmod 9 7 (jux rev) $
+    -- every 6 (rip' 0 1 12 0.5 0.1) $ 
+    -- every 5 (rip 0.5 0.05) $ 
+    rarely (stut' 1 (shift' 498 $ choose [0.0625*3, 0.0625]) (|*| gain 0.99)) $ 
+    stack [
+        s "~ teks [~ teks] ~",
+        superimpose ((# speed 0.8) . (# pan 1) ) $ s "~ future" # pan 0,
+        s "sn(3,8) ~" # n 5,
+        superimpose ((#speed 2) . (0.25 ~>) . off (0.0625*3) (id)) $ density 2 $  s "~ hh" ]
+
+
+d3 silence
+
+
+hush
+
+
+
+d1 $ sound "midi" #midichan 2
+
+
+d1 $ sound "a4" #midichan 2
+
+
+cps 1
+
+
+
+
+
+
+
+do
+    let howoften = 15
+    let mute1 p = id $ p
+    let mute2 p = id $ p
+    let densities = [0.5,0.6 .. 3 ]
+    let den p = density (discretise (1/4) $ shift' 3829 $ choose densities) $ shift $ p
+    let ctlGain = gain (randcat ( 
+                        (replicate 1 "1") 
+                    ++ (replicate 2 "1*2") 
+                    ++ (replicate 3 "1*3") 
+                    ++ (replicate 4 "1*4") 
+                    ++ (replicate 5 "1*5") 
+                    ++ (replicate 6 "1*6") 
+                    ++ (replicate 7 "1*7") 
+                    ++ (replicate howoften "1") 
+                        ))
+    d1 $ den $ s (randcat ( 
+            (replicate 1 "midi") 
+            ++ (replicate 2 "midi*2") 
+            ++ (replicate 3 "midi*3") 
+            ++ (replicate 4 "midi*4") 
+            ++ (replicate 5 "midi*5") 
+            ++ (replicate 6 "midi*6") 
+            ++ (replicate 7 "midi*7") 
+            ++ (replicate howoften "~") 
+        )) # midinote (shift' 400 $ choose [0,0,3]) # gain 1.15
+    d6 $ mute1 $ (|*| gain 1.1) $ den $ gain (randcat ( 
+            (replicate 1 "0.4") 
+            ++ (replicate 2 "0.4") 
+            ++ (replicate 3 "0.4") 
+            ++ (replicate 4 "0.4") 
+            ++ (replicate 5 "0.4") 
+            ++ (replicate 6 "0.4") 
+            ++ (replicate 7 "0.4") 
+            ++ (replicate howoften "1") 
+        )) # s "midi" # midichan 15
+    d7 $ mute2 $ (|*| gain 1.1) $ den $ gain (randcat ( 
+            (replicate 1 "1") 
+            ++ (replicate 2 "1") 
+            ++ (replicate 3 "1") 
+            ++ (replicate 4 "1") 
+            ++ (replicate 5 "1") 
+            ++ (replicate 6 "1") 
+            ++ (replicate 7 "1") 
+            ++ (replicate howoften "0.4") 
+        )) # s "midi" # midichan 15
+    d8 $ den $ stack [ 
+                 ctlGain # ctlNum 1 # control (scale 0 127 $ shift' 300 rand) 
+                , ctlGain # ctlNum 2 # control (scale 0 127 $ shift' 301 rand) 
+                , ctlGain # ctlNum 3 # control (scale 0 127 $ shift' 302 rand) 
+                , ctlGain # ctlNum 4 # control (scale 0 127 $ shift' 303 rand) 
+                , ctlGain # ctlNum 5 # control (shift' 304 $ choose [0,127]) 
+                , ctlGain # ctlNum 6 # control (scale 0 127 $ shift' 305 rand) 
+                , ctlGain # ctlNum 7 # control (scale 0 127 $ shift' 306 rand) 
+                , ctlGain # ctlNum 100 # control (shift' 238924 $ choose [0,127])
+                ] 
+            # s "midi" # midichan 15 # midicmd "control"
+
+
+
+
+d1
+$ stack [
+  struct "{ [1 1 1 ~] [[1 ~ ~ ~]]}%4"
+  $ sound "bd:2", 
+  struct "{ [~ ~ ~ ~] [[~ ~ ~ 1] ~ ~]}%4"
+  $ sound "sd"
+]
+
+
+d1 $ stack [
+  struct "{ [1 1 1 ~] [[1 ~ ~ ~]]%4}"
+  $ sound "bd:2"
+]
+
+
+d1 $ stack [
+  note "{e4 c4 e5 g5 gs5 c5 e6 g6 gs6 g6 e5 c4}%32"
+  # sound "customSynth02" 
+  #octave (wchoose [7,1,1][4,5,6])
+  #gain 1.1
+  #sustain 0.5,
+  note "{c5}%2"
+  # sound "midi" 
+  #nudge 0.25
+  #midichan 2,
+  struct "{ [1 1 1 ~] [[1 ~ ~ ~]~ ~]}%4"
+  $ sound "bd",
+  struct "{ [~ ~  ~] [[~ ~ ~ 1]~ ~]}%4"
+  $ sound "sd"
+]
+
+
+d1 $ stack [
+  whenmod 8 4 (#note  "{ds4 as4 f5 g5}%16")
+  $ note "{f4 c4 g5 a5}%16"
+  # sound "customSynth02"
+  #orbit 1
+  #room 0.5
+  #size (slow 16  $ scale 0.9  0.95  $ sine)
+  #sustain 0.7,
+  whenmod 8 4 (#note "ds as g")
+  $ note "{ <f _ [ g a ] as g> }%2"
+  # sound "midi" 
+  #nudge 0.25
+  #octave 3
+  #midichan 2,
+  stack [
+    struct "{ [1 1 1 ~] [[1 ~ ~ ~]~ ~]}%4"
+    $ sound "bd:4",
+    struct "{ [~ ~ ~ ~] [[~  ~ ~ 1]~ ~]}%4"
+    $ sound "sd"
+  ]
+]
+
+do
+  bps (140/120 )
+  let modbeat = 8
+  let modtime = 4
+  let customNotes = "{~ 0 0 7 14 12 14 ~ ~}%16"
+  d1
+    $ whenmod 12 10 ( |+|note 12 )
+    $ ( 123 ~> )
+    $ whenmod 10 5 (( |+|note (customNotes) ).(|=|note ( choose [0,12] )))
+    $ foldEvery [3,4] (slow (choose [2,4,5,6]))
+    $ whenmod modbeat modtime ( always (stut' (choose [1,2,3]) (choose [0.125,0.125*3]) (|+| note (choose [-12]))))
+    $ often (stut' (choose [1,2,3]) (choose [0.125,0.125*3]) (|+| note (choose [-12])))
+    $ stack [
+      every 3 (rev)
+      $ whenmod modbeat modtime (|+|note 3)
+      $ note ( customNotes)
+      # sound "customSynth02"
+      #gain 1.3,
+      every 4 (density 4)
+      $ every 2 (density 2)
+      -- $ foldEvery [3,4] ((#note (customNotes)).(#sound "supermandolin"))
+      $ sound "clubkick akuma5"
+      #cut 1
+      #orbit 2
+      #gain 0.8
+      #room 0.5
+      #size (slow 16  $ scale 0.5  0.7  $ sine)
+    ]
+  d2 
+    $ slow 6 $ note ("<d4 cs4>" + chord "minor7")
+    # sound "midi" 
+    # midichan 2
+
+
+
+
+

@@ -1,0 +1,76 @@
+import Sound.Tidal.SpectralTricks
+import qualified Sound.Tidal.Scales as Scales
+import qualified Sound.Tidal.Chords as Chords 
+
+
+-- choose with weight(chance).
+let wchoose weights values = choose $ concatMap (\x -> replicate (fst x) (snd x)) (zip weights values) 
+
+let sew stitch p1 p2 = overlay (const <$> p1 <*> a) (const <$> p2 <*> b)
+      where a = filterValues (id) stitch
+            b = filterValues (not . id) stitch
+
+
+let oneshot d p = do 
+                        now <- getNow
+                        d $ (playWhen (< now+1) p)
+
+
+-- eg. oneshot d1 $ sound "arpy*8"
+
+
+let warp :: [Double] -> Pattern a -> Pattern a
+    warp denoms p = foldr skip p ratios
+      where ratios = map (1/) denoms
+            skip ratio p = somecyclesBy ratio (0.125 <~) p
+
+d1 $ warp [2 .. 30]
+  $ fast 8
+  $ s "bev" # cut 1# begin (slow 200 $ saw)# up (-9)# att 0.01# rel 2# lpf 2000# gain 2
+
+-- refactored version from this pattern.
+-- d1
+-- $ somecyclesBy (1/30) (0.125<~)
+-- $ somecyclesBy (1/29) (0.125<~)
+-- $ somecyclesBy (1/28) (0.125<~)
+-- $ somecyclesBy (1/27) (0.125<~)
+-- $ somecyclesBy (1/26) (0.125<~)
+-- $ somecyclesBy (1/25) (0.125<~)
+-- $ somecyclesBy (1/24) (0.125<~)
+-- $ somecyclesBy (1/23) (0.125<~)
+-- $ somecyclesBy (1/22) (0.125<~)
+-- $ somecyclesBy (1/21) (0.125<~)
+-- $ somecyclesBy (1/20) (0.125<~)
+-- $ somecyclesBy (1/19) (0.125<~)
+-- $ somecyclesBy (1/18) (0.125<~)
+-- $ somecyclesBy (1/17) (0.125<~)
+-- $ somecyclesBy (1/16) (0.125<~)
+-- $ somecyclesBy (1/15) (0.125<~)
+-- $ somecyclesBy (1/14) (0.125<~)
+-- $ somecyclesBy (1/13) (0.125<~)
+-- $ somecyclesBy (1/12) (0.125<~)
+-- $ somecyclesBy (1/11) (0.125<~)
+-- $ somecyclesBy (1/10) (0.125<~)
+-- $ somecyclesBy (1/9) (0.125<~)
+-- $ somecyclesBy (1/8) (0.125<~)
+-- $ somecyclesBy (1/7) (0.125<~)
+-- $ somecyclesBy (1/6) (0.125<~)
+-- $ somecyclesBy (1/5) (0.125<~)
+-- $ somecyclesBy (1/4) (0.125<~)
+-- $ somecyclesBy (1/3) (0.125<~)
+-- $ somecyclesBy (1/2) (0.125<~)
+-- $ fast 8
+-- $ s "bev"
+-- # cut 1
+-- # begin (slow 200 $ saw)
+-- # up (-9)
+-- # att 0.01
+-- # rel 2
+-- # lpf 2000
+-- # gain 2
+
+---------------------------------------------
+
+-- quick and dirty way to workaround with tidal vscode extension
+-- since it's got an error whenever try to use custom boot file.
+-- so, it has to be evaled manually.

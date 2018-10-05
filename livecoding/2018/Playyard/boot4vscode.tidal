@@ -1,0 +1,26 @@
+import Sound.Tidal.SpectralTricks
+import qualified Sound.Tidal.Scales as Scales
+import qualified Sound.Tidal.Chords as Chords 
+
+
+-- choose with weight(chance).
+let wchoose weights values = choose $ concatMap (\x -> replicate (fst x) (snd x)) (zip weights values) 
+
+let sew stitch p1 p2 = overlay (const <$> p1 <*> a) (const <$> p2 <*> b)
+      where a = filterValues (id) stitch
+            b = filterValues (not . id) stitch
+
+
+let oneshot d p = do 
+                        now <- getNow
+                        d $ (playWhen (< now+1) p)
+
+
+-- eg. oneshot d1 $ sound "arpy*8"
+
+
+---------------------------------------------
+
+-- quick and dirty way to workaround with tidal vscode extension
+-- since it's got an error whenever try to use custom boot file.
+-- so, it has to be evaled manually.

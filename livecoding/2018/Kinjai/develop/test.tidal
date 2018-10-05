@@ -1,0 +1,1262 @@
+---------------------------INITIAL HEADER-----------------------------
+bps(65/120)
+
+displayOutputDevices >>= putStrLn
+
+devices <- midiDevices
+
+m1 <- midiStream devices "IAC Driver Tidal1" 1 synthController
+m2 <- midiStream devices "IAC Driver Tidal2" 1 synthController
+
+----------------------------------------------------------------------
+
+
+m1 $ n "0" #midichan 1
+
+m1 silence
+
+d1 $ sound "bd/2"
+
+d1 silence
+
+d2 silence
+
+d1 $ stack [
+   spread ($) [ fast 2, rev, slow 3, striate 3, (# speed 4) ]
+  $ inside 2 ( whenmod 6 4 (stut 6 0.224 (2/4))) 
+  $ degradeBy 0.6 
+  $ within (0, 0.5) (fast 2 ) 
+  $ foldEvery [2,4] (fast 2) 
+  $ whenmod 8 4 ( # up 2 ) 
+  $ weave 16 (smear 1.0)
+  $ [sound "hang:1", sound "hang:5", sound "hang:2"],
+   sound "jvbass" # up "-4" 
+] 
+
+
+d1 $ slowspread (slow) [2, 8]
+$ jux (|+| speed (scale 0.2 1 $ density 2 sine1))  
+$ striate' 5000 (1/100) $ sound "hang:2"  
+|+| speed (scale 0.2 1 $ density 2 sine1)
+|+| delay "0.2" 
+|+| delaytime "0.125" 
+|+| delayfeedback "0.2"
+
+d1 silence
+
+
+
+bps(65/120)
+d1 $ n "0 3 7 5 8 12 7 10 14 0 3 7" # s "supermandolin*2"
+
+d1 $ s "supermandolin*2" # n "0 3 7 5 8 12 7 10 14 0 3 7"
+
+d2 $ stack [
+sound "bd"
+]
+
+do
+  let progression p = p |*| up (slow 8 $ "0 5 10 7")
+  let melody = progression $ fast 2 $ up "0 3 7 10" |*| up "12" # s "pluck"
+  let bass = progression $ s "pluck" |*| speed "0.5" |*| gain "1.0" # shape 0.6 # cut "-1"
+  d1 $ stack [melody]
+
+
+
+cps(160/120)
+
+cps(130/120)
+
+d1 $ whenmod 8 4 (# n "cs5 e5 b5") $ n "d5 fs5 cs5" # s "supersaw" # cutoff 1000 
+
+
+m1 $ n "0"
+
+m2 $ whenmod 16 8 (#n "cs5 e5 b5") $ n "d4 fs4 cs5"
+
+do
+  let mute = const $ sound "~"
+  let pat = "{ ~ 1 ~ 1 ~ ~ 1 ~ ~ 1 1 ~  }%8 "
+  -- d2 $ whenmod 16 8 (# n "cs5 e5 b5") $ n "d4 fs4 cs5" # sound "supermandolin" # cutoff 2000
+  d1  
+    $ stack 
+    [ 
+      every 2 rev $ gain (pat) # sound "tbck:1" # shape 0.2,
+      inside 2 (whenmod 6 4 (stut 6 0.222 (1/4))) 
+      $ spread ($)[ fast 2 , rev, slow 4, (# coarse 5)]
+      $ within (0, 0.25)(fast 2 )
+      $ degradeBy 0.6
+      $ foldEvery[2,4] (fast 1.5 )
+      $ whenmod 8 4 (# up 2)
+      $ weave 16 (smear 1.0) [sound "hang:1", sound "hang:5", sound "hang:2" ]
+      # delay 0.4 
+      #delaytime 0.25 
+      #delayfeedback 0.125
+    ] 
+
+----------------------------------------------------------------------------------------------
+
+cps(140/120)
+
+let sew stitch p1 p2 = overlay (const <$> p1 <*> a) (const <$> p2 <*> b)
+      where a = filterValues (id) stitch
+            b = filterValues (not . id) stitch
+
+
+
+let scale = "< -1 -2 0 >"
+
+d1 $ stack [
+sew (iter 4 "t f f f f")
+(sound "bd(5,8,<0 4>)")
+(every 2 (# speed 2) $ off 0.125 (# speed 2) $ sound "sd*4")
+  # crush 5,
+every 2 ( #smear (0.8) ) $ whenmod 16 8 (#up scale) $ sound "pluck" #up "-4"
+]
+
+
+-- liveset.
+
+bps(140/120)
+
+d1 $ foldEvery[2,3](666 ~>)
+$ stack [
+every 2 (chop 4)
+$ slow 4
+$ stut' (4)(0.125*3)(|=| crush 4)
+$ sound (samples "stabfx*4" (irand 15))
+#cut 3
+#shape 0.2,
+degradeBy 0.3 $ density 2 $ sound (samples "akuma5*8" (irand 15)) #unit "c" #speed 8,
+slow 2 $ struct "~ 1 [~ 1] ~" $ sound "smash",
+whenmod 8 4 ((#unit "c").(#speed 8)) $ sound (samples"hh*16" (irand 15))#cut 5 #shape 0.4
+]
+
+d1 
+$ foldEvery [2,4] (666 ~>)
+$ stack [
+  spread ($)[fast 2, rev, (#speed 2 )]
+  $ every 2 (chop 4)
+  $ slow 4
+  $ stut' 4 (0.125*3)(# crush 4)
+  $ whenmod 8 4 (#speed ( 2 )) 
+  $ sound (samples "stabfx*4"  (irand 10)) 
+  #cut 1
+  #shape 0.2,
+  degradeBy 0.2 $ every 2 (fast 2 ) $ sound ( samples "akuma5*8 " (irand 12)) #unit "c" #speed 8,
+  slow 2 $ struct "~ 1 [~ 1] ~ ~ 1" $ sound "smash",
+  whenmod 8 4 (( #unit "c" ).( #speed 2 )) $ sound "hh*16" #cut 5 #shape 0.1 #cutoff (slow 2 $ scale 1300 2699 $ sine ) 
+] #crush 5
+
+-- do
+--   let pattern  = "1*16"
+--   d1  $ foldEvery [3,5] ( 444 ~>)
+--       $ stack [
+--       every 2 (chop 7)
+--       $ slow 4
+--       $ stut' 6 (0.1254*6) (#accelerate 2)
+--       $ sound (samples  "stabfx*4" (irand 7) ) #cut 1 #shape 0.2,
+--       whenmod 16 8 ( jux (#pan sine1) )
+--       $ degradeBy 0.2 $ density 2 $ sound  ( samples "akuma5*8" (irand 15) ) #unit "c" #speed 8,
+--       slow 2 $ struct "1 ~ [~ 1] ~ ~ 1" $ sound "smash" #cut "1",
+--       gain pattern # sound "hh" #cut 1
+--     ]#crush 5
+
+-- d1 silence
+
+-- bps(140/120)
+-- let mute = const $ sound "~"
+
+
+
+-----------------
+
+
+let mute = const $ sound "~"
+
+d1 $ fast 2 $ whenmod 16 8 (#note "d4 fs4 cs5")$ note "cs4 e4 b4" # sound "midi"
+
+d1 $ stack [
+  fast 2 $ whenmod 16 8  (#note "{ d4 fs4 cs5 }%6") $ note "{ cs4 e4 b4 }%6"  # sound"midi" #gain 1.2 ,
+  whenmod 8 4 (|=|up "-6")$ every 2 (linger 0.125)
+  $ striate' 32 (0.15)
+  $ every 4 (jux (#resonance  0.05 ))
+  $ sound "khan"
+  # cutoff (slow 8 $ (scale 0.05 0.95 $ sine1 * 8000))
+  #up "-8"
+  #gain 0.65
+  #shape 0.15
+  #crush (choose [1,0.5,2,2.5,6])
+  #velocity (slow 16 $ sine)
+]
+
+
+
+
+d1 $ stack [
+  fast 2 $ whenmod 16 8 (#note "{ d4 fs4 cs5 }%6") $  note "{ cs4 e4 b4 }%6" # sound "psin" #lpf 400 
+]
+
+t1 (xfadeIn 2) $ sound "khan" #cutoff 2000 
+
+d1 silence
+
+d2 $ sound "khan" #up "-8" #cut 5 
+
+
+----------------------------------------------------------------------------------------------
+
+let sew stitch p1 p2 = overlay (const <$> p1 <*> a) (const <$> p2 <*> b)
+      where a = filterValues (id) stitch
+            b = filterValues (not . id) stitch
+
+
+cps 1
+
+d1 $ sew (iter 4 "t f f f f")
+  (sound "bd(5,8,<0 4>)")
+  (every 2 (# speed 2) $ off 0.125 (# speed 2) $ sound "sd*4")
+
+
+d1 $ stack [
+  sound "midi",
+  sound "midi" #midichan 1   ]
+
+
+
+let pattern rotation  notenumber = rotL rotation $  note "0*8" |+|note notenumber
+
+let notenumber = 0 
+
+d1 $ stack [
+  rotL 333 $ n ( "0*8" + (4 ~> ( discretise (1/16) $ choose harmonicMinor ) ) ) # sound "midi" |+|note notenumber
+] # gain (slow 16 $ scale 0.5 1 $ sine1 ) #sustain 0.1
+
+
+
+d1 
+$ sound "midi"
+#sustain 0.1 
+
+
+
+
+d1 $ stack [(foldEvery [2,3,5] (fast 2) $ n "[0 0 0 0]" # s "<bass bass1>" # n "1 2 3 2 1" |*| up "0 0 0 12" # cut 1 # shape 0.9 # gain "0.8") |*| (slow 8 $ up "0 5 7 -1"), s "[bd*2, [~ sn:3], [~ hh]*2]" |*| gain "0.85" # shape 0.7, (chop 64 $ s "mp3" # speed "-1" # unit "c") |*| gain (scale 0 1 (slow 4 saw)) |*| gain (scale 0 1 (slow 4 saw)) |*| gain (scale 0 1 (slow 4 saw)) |*| gain (scale 0 1 (slow 4 saw)) |*| gain 0.9, stut 4 0.5 1.5 $ slow 8 $ s "cc" # cutoff 3000 # hcutoff 9000 |*| gain 1.5]
+
+
+d1 $ sew ( iter 4 "t f t t f f t f")(sound"bd")(every 2 (#speed 2) $ off 0.125 (#speed 2 )  $ sound"sd*4")
+
+d1 
+$ stack [
+    every 2 rev $ gain (pat) # sound "tbck:1" # shape 0.4
+] 
+
+d2 silence
+d1 silence
+m2 $ n "d4"
+
+d1 $ sound "bd"
+
+d1 $ struct "x(7,16)" $ sound "bd"
+
+
+d1 $ gain (pat) # sound "bd"
+
+do
+  d1 silence
+  m2 silence
+
+m1 silence
+
+m2 silence
+
+d2 silence
+
+
+d2 silence
+
+d1 silence
+
+vd1 $ degradeBy 0.3 $ density 2 $ f "{0.23 0.75 0.56 0.34}"
+
+
+d1 silence
+
+d2 $ sound "bd*4"
+
+d1 $ every 2 (fast 2) $ stack [
+note "c a f e" # s "midi",
+sound "bd*2"
+]
+
+cps(140/120)
+
+d1 $ whenmod 16 8 (#note "cs4 b4 e4") $ note "d4 fs4 cs4" # sound "midi"
+
+
+d1 $ sew (iter 4 "t t t f t f")
+(sound "bd(5,8,<0 4>)")
+(every 2 (#speed 2 )$ off 0.125 (#speed 4) $ sound "sd*4")
+#crush 4
+
+
+d1 $ off 0.125 (#crush 2) $ sound "sd"
+
+d1 $ stack [
+whenmod 16 8 (#note "[cs5,e4,b4]") 
+$ sound "midi/4"
+# attack 1.0 
+# gain 0.4 
+# note "[ d4 ,fs4, cs5 ]",
+whenmod 16 8 (#note "cs5 e4 b4") 
+$ note  "d4 fs4 cs5" # sound "tutorial4" 
+]
+# delaytime 0.125 
+#delayfeedback 0.5 
+#delay 0.8  
+# room 0.4
+
+
+
+
+d1 $ stack [
+  sound "bd",
+  sound "~ [~ [ho:2 hc/2]]" # cut "1"
+  ]
+
+
+d1 $ sound "[bev, [ho:3](3,8)]" # cut "-1"
+
+
+cps (70/120)
+
+let patternDrum = "[ 1 ~ 1 ~ ~ 1 ~ 1 ~ 1 ~ ~ 1 ~ 1 ~ ]"
+
+let mute = const $ sound "~"
+
+d1 $ stack [
+  struct patternDrum 
+  $ sound "midi" 
+  #sustain 0.1 #orbit 0,
+  whenmod 12 8 (# note "d4 e4") $ slow 4 $ note "a4 c4" # sound "midi" #midichan 2 ,
+  foldEvery [2,4] (fast "{ 2 4 6 8 }") $  sound "hh*16",
+  mute 
+  $ whenmod 8 4 (struct patternDrum) 
+  $ foldEvery [2,4] (jux (#speed 2) ) 
+  $ sound "{ ~ teks:2 ~ [~ teks:2] ~ teks:2 }%16 " 
+  #gain 0.7 ,
+  sound "~ sn:4" 
+  #unit "c" 
+  #speed 4 
+  # crush 5 ,
+  sound "pluck"
+]
+
+
+d2 $ sound "hh*16" 
+
+d1 
+$ whenmod 8 4 ( every 2 (slow 1.2) . 
+whenmod 6 4 (jux (# speed 2 )). 
+every 4 (density 2)) $ sound  "sd*8" 
+
+
+d1 $ whenmod 7 4 (delay (scale 0.01 0.5 $ slow 2.71 )) $ sound "sd"
+
+
+cps 0.9
+
+bps (130/120)
+
+d1 
+$ stack [
+  sound "bd(3,8)",
+  whenmod 16 8 (#note "{ d4 fs4 cs5 }%6") 
+  $ note "{ cs4 e4 b4 }%6" # sound "customSynth02" #octave 4 #lpf 200 
+]
+  -- #gain 1.1 
+  -- #sustain 0.4 #octave 4 #delaytime 0.25  #delayfeedback 0.125 #delay 0.5   #size 0.4
+  -- #lpf (slow 16 $ scale 200 800 $ sine1)
+
+bps(140/120)
+
+d1 $ foldEvery [2,4] (454 ~>)
+$ stack [
+  every 2 (chop 4)
+  $ slow 2  
+  $ stut' 6 (0.234*3)(#crush 4)
+  $ sound ( samples "stabfx" (irand 10)) 
+  #shape 0.2
+  #cut 5,
+  degradeBy 0.2 
+  $ sometimesBy 0.2 (chop 6)
+  $ fast 2 
+  $ sound  ( samples "akuma5*8"  (irand 12)) 
+  #unit "c" #speed 8,
+  mute $ sew (iter 4 "f t t f t f")
+  (density 2 $ sound "bd(5,8, <4 0>)")
+  (every 2 (density 2) $ sound "sd:2*4" ),
+  -- mute $
+  slow 2 
+  $ struct "~ 1 [~ 1 ] ~ " 
+  $ sound "smash",
+  foldEvery [2,3,4] (density 2 .(  #speed 2 ))
+  $ sound "alpch*8" #gain 0.95 
+] #crush 5 
+
+d1 $ foldEvery [2,3,4] (density 2 ) $ sound "alpch" #gain 0.9
+
+let mute = const $ sound "~"
+
+hush
+
+
+--  needs develop!!!!!!
+
+
+let mute = const $ sound "~"
+
+let mute = const $ sound  "~"
+
+d1 $ stack [
+  whenmod 8 4 (#note "{ as4 cs4 gs4 }%8") 
+  $ every 2 (( fast 2 ).(#sustain 0.5)) $ note "{ gs3 b4 ds4 }%8" 
+  #octave (choose [3,4,5]) 
+  # sound "customSynth02" 
+  #sustain 1 
+  #shape 0.35
+  #gain 1.2,
+  mute $ whenmod 8 4 (#note "{ as4 [b4 ~] ~ d4 }") 
+  $ every 2 (chop (choose [2,4,6]))
+  $ foldEvery [2,3..5] (fast 2) 
+  $ sound "supersaw" 
+  # note (slow 2 "<gs4 b5 d4 [as4 cs4 f4]>") 
+  #octave (choose [5,6]),
+  sound "bd(3,8)" #cutoff 700 #shape 0.6,
+  whenmod 8 4 (|=|up "-6")$ foldEvery[2,3,4] (linger 0.125)
+  $ striate' 32 (0.15)
+  -- $ every 4 (jux (#resonance  0.05 ))
+  $ sound "khan"
+  # cutoff (slow 8 $ (scale 0.05 0.95 $ sine1 * 8000))
+  -- # cutoff 1000 
+  #up "-8"
+  #gain 0.75
+  #end 0.3
+  #shape 0.15
+  -- #crush (choose [1,2,2.5,6]) 
+  #velocity (slow 16 $ sine)
+] 
+
+
+d1 $ sound "supersaw"
+
+
+d1 $  whenmod 8 4 (#note "[ as4 b4 ] ~ ") $ sound "supersaw" # note (fast 2 "<gs4 as4 b4 d4 cs4 [fs4 ]>" )
+
+d1 $ sound "supersaw" |+| note $ toScale [0,2,3,5,7,8,10] ("[4 0 2 0]" + "<5 3 4 0>")
+
+d1 $ n (scaleP "harmonicMinor" (contToPat 12 (scale 9 12 sine))) # s "supersaw"
+
+d1 $ s "supersaw" # note (slow 6 "<[0 3 5 7 9 11] [2 4 8 11 13 15]>")
+
+
+do
+  bps (160/120)
+  let ton = fmap (+5)
+      mode = "dorian"
+      idl1 = "[0, 2, 6,  0, 2, 7, 0, 2]"
+      idl2 = "[1, 3, 6,  1, 3, 6, 1, 3]"
+      idl3 = "[2, 4, 7,  2, 4, 6, 2, 4]"
+      idl4 = "[3, 5, 10, 3, 5, 6, 3, 8]"
+      idl = [idl1, idl2, idl3, idl4]
+      arp = n (ton $ scaleP mode $ breakUp $ cat idl)
+      pad = n (ton $ scaleP mode $ cat idl)
+      bss = up (ton $ scaleUP mode $ breakUp $ cat idl)
+      rhy = struct "x(3,8)"
+  t1 (j 0) . i
+     -- . fa "1 1.5 2"
+     -- . spaceOut [0.2,0.3..1++1..0.3,0.2]
+     -- . spaceOut ([1,2..4] ++ [4,2..1])
+     -- . spaceOut (map (1/) [1,2..10])
+     -- . str "2"
+     -- . spaceOut ([1,1.2..4] ++ [4,3.8..1])
+     -- . iter "<2 3 4>"
+     $ stack [
+        arp > s "superacid" > go "0.8:0" > legato (ssinf 0.8 1.5 0.125)
+        ,pad > s "superbuf" > go "0.5:2" > octave 3
+        ,rhy bss > s "[bssaw, bspluck]" > go "0.9:4" > legato "1.5" > release 3.5
+        ,rhy $ s "[bdk2:2, pcmsn:3, cp]" > go "0.9:6"
+        -- ,s "superbuf" > adsr' 0 1 1 0.5 > go "0.9:2"
+        -- ,s "superpulse" > adsr' 0 1 1 0.5 > go "0.9:4"
+        -- ,s "superzzz" > adsr' 0 1 1 0.5 > go "0.9:6"
+       ]
+     -- > eq 0e3 20e3 20e3 0.0
+     > spa' 1 0
+     > rvb' 0.2 0.4
+     -- > del' 0.1 0.128 0.4
+  -- hush
+
+
+import qualified Sound.Tidal.Scales as Scales
+                       
+let minScale = toScale Scales.minor
+
+d1 
+$ stack [juxBy 0.25 (every 4 (linger 0.75)) 
+$ n (minScale $ shuffle 8 "0*2 8*4") 
+# sound "supersquare" 
+# coarse "2 5 10", 
+every 4 (rev . slow 4) 
+$ slow 3 $ n (minScale $ run "<24 36>") # sound "supersquare"] 
+# delay 0.5 
+# delayt 0.4 
+# delayfb 0.5
+
+
+
+d1 
+$ inside 2 (whenmod 7 6 ((zoom (0.25, 0.75)).(stut 8 0.5 (-1/4)))) 
+$ inside 2 (whenmod 12 10 ((overlay (fast "[4 8 16]*8%3" $ s "gabba:1")).(slow 4))) 
+$ stack[inside 4 (whenmod 3 2 (|*| accelerate "[1 -1]")) 
+  $ foldEvery [3,4,5,6] ((1/4) <~) 
+  $ loopAt 1 
+  $ chop 8 
+  $ s "breaks125" 
+  |*| release 0.3, 
+  stut 16 0.5 4 
+  $ up "[0,3,5,-2]/4" 
+  |*| speed 8 
+  |*| up "<0 5 -1>/4" 
+  |*| up "<0 3 -3>/8" 
+  # s "moog" 
+  # release 1.5 
+  |*| gain 0.7
+]
+
+
+
+import qualified Sound.Tidal.Scales as Scales
+d1 $ n (toScale (Scales.lydian) ("[0 3] 5]" + ("0 1" *(slow 4 $ run 4)) - 12)) # s "supersaw" # lpf 300
+
+d2 $ stack [
+  every 4 (|=| gain 1.0) $ s "hh*4 hh" # gain 0.0,
+  slow 4 $ s "~ sn:1 ~ ~",
+  slow 4 $ s "~ bd:3"
+]
+
+d3 
+$ slow 2 
+$ n (toScale (Scales.lydian) ("{0,4}" + "<0 1 2 4>" )) 
+# s "supersaw" 
+# lpf 300 
+# attack 1.0 
+# release 6.0
+
+d3 silence
+
+d4  
+$ slow 2 
+$ n (toScale (Scales.pentatonic) ("0 [1 2] [0 ~ 0 1] [2 3]" - (slow 8 $ run (choose [3,5,6,8,9])) + 8))
+# s "superpiano" 
+# vowel "o" 
+# shape 0.95 
+# gain 0.6 
+# sustain 0.9 
+# cutoff 1000
+
+d5 $ swing 1 
+$ slow 1.0 
+$ slow (1/(choose [1,2,3,4,6,8])) 
+$ n (toScale (Scales.lydian) ("8" + (irand 8))) 
+# s "superpwm" 
+# vowel "u" 
+# gain 1.0 
+# attack 0.1 
+# release 1.0
+
+
+d1 
+  $ slow 2 $ n (toScale (Scales.lydian) (run 8)) 
+  # s "cs80lead"
+  #sustain 1
+  
+
+
+
+d1 
+$ note ("[{ 0 4 7 11}%24 {11 7 4 0}%24 {0 4 6 9}%24 {9 6 4 0}%24] + [5 7]/32") 
+# sound "supersaw"
+
+
+cps (0.8)
+
+-- needs develop!!!!!
+
+d1 
+  $ stack [
+    midinote ("[{ 0 4 7 11}%24 {11 7 4 0}%24 {0 4 6 9}%24 {9 6 4 0}%24]/ 12 " + 48 + "[5 7]/16") 
+    # sound "superpiano"
+    # cutoff 2000 
+    #sustain 0.3,
+    midinote ( " [ 24 ~ 7 12 16 19 ] " + 48 + "[5 7]/32" ) # sound "supersaw" 
+    #sustain 0.3
+    #cutoff 900,
+    struct "_ [ _ 1 ] [ _ 1 ]" $ sound "bd" #cutoff 1400
+  ]
+
+
+d1 $ stack[
+  -- sometimes (jux (rev)) $
+  midinote ("[{ 0 4 7 11}%24 ]/ 2 " + ( choose [24,36,48,60] ) + "[4 7]/11") 
+  -- midinote ("[{0 4 6 9}%24]/ 2 " + 48 + "[5 7]/11") 
+  # sound "customSynth02" 
+  #orbit 1 
+  -- #cutoff 2000 
+  #shape 0.5
+  #gain 1.1
+  -- #crush 4
+  #sustain 0.2,
+  midinote ( " [ 24 ~ 7 12 16 19 ] " + 36 + "[4 7]/11" ) # sound "supergong" ,
+  slow 2 $  sound "~ [ teks:3 ]",
+  -- sound "~ [ smash] {~ smash:8 }%2" #cutoff 2020 ,
+  slow 2 $ sound "jvbass" #unit "c" #speed 3
+  -- note ("[24 ~ 7 12 16 19]" + (-12) + "[5 7]/11") # sound "supersaw" #cutoff 2000
+]
+ 
+
+
+
+d1 
+$ note ("[ { b3 d3 fs3 g4 }%12 ] / 2" + 12 + "[5 7]/11") 
+# sound "superpiano"
+# sustain 0.3
+#cutoff 2000
+
+
+d1 
+$ midinote ("[{ 0 4 7 11}%24 ]/ 2 " + ( wchoose [1,8,1,1] [24,36,48,60] ) + "[4 7]/11") 
+# sound "customSynth02"
+#sustain 0.5
+
+
+
+d1
+  $ slow 2 
+  $ midinote ("[ 24,7,12,16,19 ]" + 36 + "[4 7]/11") 
+  #sound "midi" 
+  #midichan 3 
+  #gain 0.5  
+  #ccn "51"
+  #ccv "12 17 128 251" 
+
+
+
+
+
+d1 $ midicmd "[start/4,midiClock*48]" # sound "midi" #midichan 3
+
+d1 $ sound "midi" #midichan 2 #midicmd "control" #ctlNum 51 #control 100
+
+-- midi control should send to dirt server separatly, ex. d1 for controlling note , d2 for controlling cc.
+-- currently, can't figure it out, how to use same dirt-server.
+
+d1 
+  $ stack [
+    fast 2 
+    $ slow 3 
+    $ midinote ("[ 24,7,12,16,19 ]" + 36 + "[4 7]/11") 
+    #sound "midi" 
+    #midichan 2,
+    slow 4 $ note "c4" # sound "superpwm/2",
+    sew (iter 4 "t f f t f") 
+      (sound "bd(5,8,<0 4>)")
+      ( every 2 (#speed 2) $ off 0.25 (density "2") $ sound "sd")#room 0.24 #crush 4,
+    sometimes(  foldEvery [2,3,4] (density 2) ) $ sound "hh*8",
+    slow 2 $ sound "arp/2"#orbit 1 #up "-1" #shape 0.6
+  ]
+
+
+
+d1 silence
+  
+d2 $ sound "midi*16" #midichan 3 
+  # midicmd "control" 
+  # ctlNum 51 
+  # control (slow 12 (scale 0 127 $ (sine1)))
+  -- #control 127
+
+
+
+d2 silence
+
+d1 $ sound "bd ~ ~ bd ~ ~ bd ~ ~ bd ~ ~ bd ~ ~ ~" #speed "-1"
+
+
+d1 $ fast 16 $ spaceOut [3,3,3,3,4] $ sound "bd" #speed "-1"
+
+
+
+
+sound "bd(5,16)"
+sound "bd@3 bd@3 bd@3 bd@3 bd@4"
+
+d1 $ sound "alonevox/8" #unit "c" #speed 0.225    
+
+
+d1 $ loopAt 4 $ chop 32 $ sound "alonevox" #up "<-2 -4 0 2 > "
+
+d1 $ sound "alonevox"
+
+d1 $ chop 32 $ loopAt 4 $ sound "alonevox"
+
+
+
+
+-- needs develop~!!!!!!
+d1 $ stack [
+  -- superimpose (#up "-5")
+  sound "alonevox"
+  #room 1 
+  #size (scale 0.95 0.99 $ sine1)
+  #attack 1 
+  #up (slow 4 $ scale ( -12 ) ( -1 ) $ sine)
+  #delayfeedback 0.125
+  #delaytime 0.125
+  -- #orbit 1
+  #delay 0.4,
+  sound "industrial:20/4" #speed "-0.5" #gain 0.4,
+  -- foldEvery [2,4 ] (density 2) $ sound (samples "gltch(3,8)"  (irand 20)),
+  sound "{ [ bd bd ] ~ ~ ~ }%4 " #cutoff 2000 #shape 0.5
+]
+
+
+
+
+cps (65/120)
+
+do
+  let whenmod' n s e = when ( (\c -> (c >= s) && (c < e)).(`mod` n) )
+  d1
+    $ whenmod' 128 0 8 ((stut "<0 1 2 3 4 6>" 0.5 0.5).(slow "<1.5 2 4 6 8>"))
+    $ every' 8 7 (within (0.5, 1) (stut 3 0.25 0.5))
+    $ stack [
+      every' 4 3 (within (0, 0.5) (stut 4 0.5 0.5))
+      $ slow "1 1.5 2"
+      $ stack [
+        sound "909(<2 3>,4)" # shape 0.5 # coarse "4 2",
+        sound "ifdrums(3,8,<0 5>)" # shape 0.5 # speed 0.7 # coarse "6 8"
+      ],
+      whenmod' 128 0 16 (slow "1 2")
+      $ stack [
+        whenmod' 64 0 8 (# gain 0) $ stut "<4 4 [4 2]>" 0.25 0.25 $ gain "[0 1]*8" # sound "808:1" # legato (slow 4 $ scale 0.1 1 sine1) # pan (fast 2 $ scale 0.25 0.75 sine1) |*| gain 1.1,
+        every' 3 2 (0.125 <~) $ iter 4 $ gain "[1 0.8 0.8 1 0.5 1 0.8 1]*2" # sound "lt" # lpf (slow 4 $ scale 400 300 tri1) # lpq 0.05 # speed 0.5 # hpf 100 # coarse 12
+      ],
+      stut 4 0.5 0.25 $ slow 1.5 $ sound "if:2(1,8,2)" # speed 0.7 # coarse 8 # legato 2 # lpf 2000,
+      gap (choose [4,8,12]) $ sound "stab:3*16" # gain (slow 3 $ scale 0.9 0.5 sine1) # coarse 4 # speed 0.8,
+      stut "<3 3 4 4>" 0.75 0.75 $ sound "[~ insect:1/2] ~ ~ ~" # coarse 2 # up 1,
+      every' 4 3 (stut 6 0.25 0.75) $ every' 3 2 (0.125 ~>) $ slow 1.5 $ gain "0 0 1 0" # sound "short:1" # shape 0.5 # coarse 4 # speed 0.8 # hpf 100 |*| gain 1.1,
+      whenmod' 8 0 4 (# gain 0) $ stut 3 0.25 0.5 $ gain "[1 0.8]*6" # sound "auto:9" |*| gain 0.9 # hpf 100 # speed (-0.9),
+      (0.25 ~>) $ sound "jungbass:14/2" # gain 1,
+      stut 4 0.75 2 $ (1 <~) $ sound "[flick:2, dr:13](1/4,8,6)" # shape 0.5 # legato 2 # speed 0.8,
+      stut "6 4" 0.75 0.75 $ sound "808(1/2,8,3)" # speed (0.5) # bpf 1200 # gain 1.1
+    ]
+
+
+
+
+
+
+d2
+$ stack [
+  gain "[1 0.5]*8" # sound "chin" # gain 1.2,
+  sound "v:3(1/2,8,7)" # speed 0.5,
+  whenmod' 8 4 8 (# gain 0) $ sound "d*16" # gain (slow 2 $ scale 0.5 1 saw1) # lpf (slow 4 $ scale 2000 1000 tri1) # lpq 0.15,
+  whenmod' 64 0 8 (# gain 0) $ stut 4 0.5 0.5 $ (0.125 ~>) $ up "~ ~ [[0 5] [~ 2]] ~" # sound "sundance:3" # gain (slow 8 $ scale 1 1.3 sine1) |+| up 12 # lpf 1200 # legato 2 # coarse 8,
+  (1 <~) $ sound "flick:1(1/4,8,3)"
+] # room 1 # size 0.98 # orbit 1 |*| gain 0.8
+
+hush
+
+
+
+
+cps (65/120)
+
+do
+  let whenmod' n s e = when ( (\c -> (c >= s) && (c < e)).(`mod` n) )
+  d1
+    $ every' 8 7 (trunc 0.75)
+    $ every 3 (within (0.25, 0.75) (slow 2))
+    $ whenmod' 8 5 8 (iter 4)
+    $ stack[
+      every' 4 2 (0.125 ~>) $ sound "[feel:6/2, auto:5]" # shape 0.4 # speed 0.8 # coarse 6,
+      iter 4 $ stut 3 0.7 "<0.5 0.25>" $ sound "bass3(3,6,<2 1>)" # shape 0.5 # hpf 200 # up 0 # gain 0.85 # coarse 6 # lpf (slow 4 $ scale 400 2000 tri1) # lpq 0.1,
+      iter 4 $ stut 4 0.5 0.75 $ sound "jungbass(3,8,<0 1>)" # shape 0.4 # gain 1.2 # hpf 60 # up 2 # coarse 4,
+      (0.125 ~>) $ sound "bend*4",
+      (0.125 ~>) $ stut (choose [8, 12, 16]) 0.25 1 $ gain "[0.8 1] 0 0 0 0 0 0 0" # sound "[industrial:4]" # coarse 6 # shape 0.5,
+      stut (choose [4, 6, 8, 12]) 0.5 1 $ stut (choose [1, 2]) 0.8 0.125 $ slow 1.5 $ sound "[flick:1](1,8,<1 3>)" # coarse 6 # shape 0.2 # speed (choose [0.25, 0.5]) # gain (fast 3 $ scale 0.9 1 tri1) # pan (fast 12 $ scale 0.25 0.75 sine1),
+      sound "[909, ifdrums](<3 4>,8)" # shape 0.5 # gain (slow 8 $ scale 0.25 1 sine1) # coarse 6 # speed 0.8,
+      whenmod' 16 0 8 (# gain 0) $ gain "1*16" # sound "808:1" # pan "[0.25 0.75]*8" # speed 1 # coarse 2 # gain 1.1
+    ]
+    
+    hush
+    
+
+d1 $ sound "bend:3/2" #speed "-0.5" #room 1 #size (slow 8 $ scale 0.95 0.99 $ sine)
+
+d1 $ spin 2 $ sound "bd*4"
+
+
+d1 $ sound "industrial:20"
+
+
+d1 silence
+
+
+d1 $ slow 6 $  sound "alonevox" #unit "c" #speed 0.15
+
+d2 $ sound "clubkick:4"
+
+d1 $ note "c5" # sound "midi" #midichan 0 
+
+d1 $ density 4 $ s "akuma5*2 [ bd ~ akuma5 ]"
+
+d1 $ sound "akuma5"
+
+d1 $ foldEvery [2,3,4] (density "2  3 4" ) $ whenmod 6 4 (density 2)  $ sound "bass2*4 akuma5"
+
+
+d1 $ s "[bass2 bass2 ~ ~] sd [bd ~ ~ bd] [~ ~ bass2 ~] [~ bass2 ~ ~] sd [bd ~ ~ bd] [~ ~ sd ~] " # crush 4
+
+d1 $ s "akuma5"
+
+
+d1 $ foldEvery [3,5] (666 ~>) 
+$ stack [
+  -- sometimesBy 0.8 (#sound "~/2")
+  sometimesBy 0.5 ( stut' 4 (0.126*3)(#coarse 5) )
+  $ foldEvery [5,8] (density 2 )  
+  $ whenmod 12 8 (#randcat [sound "arpy ~", sound "teks:2 [ ~ stabfx ] ~ ", sound ( samples " bass2" (irand 10) )] )
+  $ whenmod 8 4 (#randcat [ sound "sd ~ bd", sound "bd:1 ~ [bass2:5 ~] hh ~ akuma5"])  
+  $ whenmod 4 2 (density 2) 
+  $ sound ( samples " bass2*4" (irand 10)) 
+  #cut 1 #unit "c",
+  struct "1(5,8)" $ note (toScale Scales.harmonicMinor (run (irand 12))) 
+  # sound "customSynth02" 
+  #shape 0.9 #gain 1.1 #octave 4,
+  every 2 (density 2) 
+  $ sound "sd"
+]
+
+d1 $ sound "customSynth02"
+
+bps(140/120)
+
+d1 silence
+
+let mute = const $ sound "~"
+
+d1 
+$ sometimes ( spread ($) [ rev, (#accelerate 2), (chop 4), (#crush 5)] )
+$ foldEvery [2,4] (444 ~> )
+$ stack [
+  mute $ stut' 4 (0.126 * 3)(#crush 5)
+  $ slow 4
+  $ sound ( samples "stabfx*4" (irand 10)) 
+  #cut 5,
+  mute $ foldEvery [2,4] (#speed 6 ) 
+  $ degradeBy 0.2 $ every 2 (density 2) 
+  $ sound  ( samples "akuma5*8" (irand 10)) 
+  #unit "c" 
+  #speed 2, 
+  slow 2 
+  $ whenmod 8 4 (struct "1 ~ 1  [~ 1]") 
+  $ struct "~ 1 [1 ~] ~ " 
+  $ sound "smash",
+  sound "hh*16" 
+  #shape 0.3, 
+  sound "bend:3(1,8,8)" #coarse 4 #speed (-0.5) 
+]
+
+
+t1 (xfadeIn 2) $ stack [
+  slow 1.5 $ sound "lighter" 
+  #speed (choose [ 1, 1.5 ]),
+  sound "bend:4(1,5,6)" #coarse 4 #speed (-0.5),
+  sound "industrial" #speed ( -0.25 )
+] #room 0.2 #size (slow 16 $ scale 0.95 0.97 $ sine1)
+
+
+d1 silence
+
+
+d1 $ sound "sd"
+
+
+
+cps 0.5
+
+d1 
+$ whenmod 8 4 (#up (-6)) 
+$ sound "khan" 
+#up "-8"
+#room 0.6 
+#size (slow 16 $ scale 0.9 0.95 $ sine)
+#gain 0.5
+#end 0.3 
+
+
+
+d1 $ stack [
+  whenmod 8 4 (#note "{ as4 cs4 gs4 }%8")
+  $ every 2 ( (fast 2 ).(#sustain 0.5 )) 
+  $ note "{ gs3 b4 ds4 }%8"
+  #sound "customSynth02"
+  #octave (wchoose [1,1,1,8] [2,3,4,5])
+  #sustain 1 
+  #shape 0.35
+  #gain 1.2,
+  whenmod 8 4 (#up "-6") 
+  $ slow 4
+  $ every 4 ( jux (#resonance (scale 0.2 0.9 $ sine)))
+  $ striate' 62 (0.125)
+  $ sound "khan" 
+  -- #room 1 
+  -- #size ( slow 16 $ scale 0.9 0.95 $ sine)
+  #gain 0.5
+  #attack 0.9 
+  #release 0.5 
+  #shape 0.3
+  #end 0.3 
+  #up "-8"
+]
+
+let mute = const $ sound "~"
+
+d1 $ stack [
+  whenmod 16 8 (#note "{ as4 cs4 gs4 }%8")
+  $ note "{ gs3 b4 ds4 }%8"
+  # sound "customSynth02"
+  #legato 1 
+  #gain 1.2
+  #sustain 1,
+  striate' 32 (0.125)
+  $ whenmod 16 8 (#up "-6")
+  $ sound "khan" 
+  #up (-8)
+  #gain 0.6
+  #attack 1
+  #release 4 
+  #end 0.3
+  #room 0.5
+  #size (slow 16 $ scale 0.9 0.95 $ sine)
+] 
+
+let mute = const $ sound "~"
+
+d1 $ stack [
+  whenmod 8 4 (#note "{ as3 cs4 gs4 }%8")
+  $ whenmod 8 7 ( density "2" )
+  $ note "{ gs3 b4 ds4 }%8"
+  #octave (wchoose [1,8,1] [4,5,6])
+  #sound "customSynth02"
+  #sustain 0.6 
+  #shape 0.6
+  #gain 1.2,
+  whenmod 8 4 (#note "as3/2") 
+  $ note "gs3/2" # sound "midi"
+  #shape 0.3
+  #octave 6 
+  #midichan 3,
+  striate' 32 ( 0.125)
+  $ whenmod 8 4 (#up "-6")
+  $ sound "khan" 
+  #orbit 1
+  #room 1
+  #size (slow 16 $ scale 0.9 0.95 $ sine)
+  #gain 0.5
+  #up "-8"  
+  #end 0.3,
+  slow 2 $ struct "{ ~ 1 }%2" $ sound "teks:3"
+] 
+
+
+
+
+cps 1 
+
+let pattern = "{ 1 ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ ~}%6"
+let pattern2 = "{ 1 ~ 1 ~ ~ 1 ~ ~ 1 ~ ~ 1 ~ 1 1}%6"
+
+d1 $ stack [
+  whenmod 2 1 (struct pattern2) 
+  $ struct pattern 
+  $ sound "bd:3"  #shape 0.4
+]
+
+
+
+
+d1 $ sound "midi" #midichan 3
+
+
+
+
+d1 $ stack [
+  sound "clubkick(3,8)" #cutoff 500,
+  sound "midi" #octave 4 #midichan 3
+]
+
+
+d1 $ spread striate [32, 512, 64, 4] $ n "f a c e" # s "supersquare" # legato "<1 4 8>"
+
+
+cps 0.8
+
+d1 $ stack [
+ midinote ( "[{ 0 4 7 11}%24 ]/ 2" + 48 + "[4 7]/11" ) 
+  # sound "midi"
+  #gain 1.1,
+  foldEvery [2,4] (rev)
+  $ every 3 ( stut' 4 (0.125) (#crush 4))
+  $ every 4 (fast 2 )
+  $ every 2 (density 2 ) 
+  $ struct "{1 ~ 1 ~ ~ 1 ~ ~ 1 ~ 1}"
+  $ sound  ( samples "gltch" (irand 10)) 
+  #orbit 1 
+  #shape 0.4
+  #room 0.5
+  #size (slow 16 $ scale 0.5 0.7 $ sine)
+  #cut 1,
+  whenmod 12 6 (#midinote "61 62")
+  $ struct "[1 1]/11" $ midinote "59" # sound "midi" #midichan 2,
+  whenmod 8 6 (#midinote "55") 
+  $ struct "[ 1 1 ] /11" 
+  $ midinote "59" 
+  # sound "midi" 
+  #midichan 3 
+]
+
+
+d1 $ sound "midi" #midichan 3
+
+
+cps 0.7
+
+d1 
+$ stack [
+  midinote  ( "[{ 0 4 7 11}%24 ]/ 2" + 48 + "[4 7]/11" )
+  # octave 6
+  # sound "midi",
+  whenmod 8 4 (#midinote "61 62" ) 
+  $ struct "[1 1]/11" $ midinote "59" # sound "midi" #midichan 2,
+  struct "[1 1]/11"   
+  $ whenmod 8 4 (# midinote "55" )
+  $ midinote "59" 
+  # sound "midi" 
+  #gain 0.6
+  #midichan 3,
+  foldEvery [3,4] (rev) 
+  $ struct "{ 1 ! ~ 1 ~ ~ 1 ~ ~ 1 }%11" $ sound "clubkick:2"
+  #shape 0.4
+  #crush 5
+  #cutoff 2000,
+  sometimesBy  0.4 ( stut' 6 (0.126)(# coarse 5) )
+  $ degradeBy 0.5
+  $ foldEvery [2,4]( jux  ( ( #speed "2").(density 2) )  )
+  $ every 2 ( density 2)
+  $ sound ( samples "gltch*16" (irand 20))
+  #gain 0.7
+  #cut 1,
+  stack [
+    sound "bend/4",
+    sound "teks:2/5" #unit "c" #speed (choose [(-1), 3.5]),
+    sound "industrial:20/6" #speed "-1"
+  ]
+  #orbit 1
+  #room 0.6
+  #size (slow 16 $ scale 0.5 0.7 $ sine)
+]
+
+d1 $ stack[
+  -- sometimes (jux (( rev ).(# crush 5))) $
+  midinote ("[{ 0 4 7 11}%24 ]/ 2 " + ( wchoose [1,8,1,1] [24,36,48,60] ) + "[4 7]/11") 
+  -- midinote ("[{0 4 6 9}%24]/ 2 " + 48 + "[5 7]/11") 
+  # sound "customSynth02" 
+  #orbit 1 
+  #cutoff (slow 16 $ scale 900 5000 $ sine) 
+  #shape 0.6
+  #gain 1.1
+  -- #crush 4
+  #sustain (choose  [ 0.2, 0.3,0.4,0.5,0.6 ] ),
+  -- midinote ( " [ 24 ~ 7 12 16 19 ] " + 36 + "[4 7]/11" ) # sound "supergong" ,
+  slow 4 $  sound "~ [ teks:3 ]" #gain 0.8,
+  -- midinote ("24" + 36 + "[4 7]/11") # sound "rhodes" #gain 0.5 #dur 2,
+  sound "[ bd ] " #shape 0.3,
+  -- note ( " [ c5 d5 ds5 f5 ]/4 " +  "4") # sound "midi" #midichan 1 #gain 1.1,
+  midinote ("[ 24,12,19]" + 36 + "[4 7]/11") 
+  # s "midi" 
+  # midichan 2 
+  # gain 0.4,
+  slow 2  $ midinote ( "24 ~ [ 12 26 ] " + 24 + "[4 7]/5.5" )
+  # sound "midi2" #midichan 1 
+  #octave 6 
+  #gain 1,
+  note "23/2" # sound "midi" #octave 3  #midichan 3 
+] 
+
+d1 $ sound "midi"
+
+d1 $ sound "midi" #midichan 2 
+
+hush
+
+d1
+$ whenmod 16 8 ( (|=|note ("[fs4,a4,d5]")).(#gain 0.9) ) 
+$ note (  "[ d4, a4, fs5 ]" )
+#sound "churchorgan" 
+#attack 1.5
+#release 5 
+#sustain 8 
+
+
+d1 $ stack [
+whenmod 8 4 (|=|note ("c4" + chord "minor"))
+$ note ("d4" + chord "minor" )
+#sound "midi" 
+#midichan 4 ,
+sometimesBy  0.4 ( stut' 6 (0.126)(# coarse 5) )
+  $ degradeBy 0.5
+  $ every 5 ( struct "{ 1 ~ 1 ~ ~ 1 ~ 1 ~ ~ 1 }%8")
+  $ every 4 (rev)
+  $ foldEvery [2,4]( jux  ( ( #speed "2").(density 2) )  )
+  $ every 2 ( density 2)
+  $ sound ( samples "gltch*16" (irand 20))
+  #gain 0.9 
+  #cut 1
+]
+
+
+d1 
+$ whenmod 8 4 (#midinote "58") 
+$ sound "midi" 
+#midichan 4 
+
+d1 silence
+
+
+oneshot d1 $ sound "khan"
+
+
+d1 $ stack [
+whenmod 8 4 (#randcat [ sound "akuma5 ~ akuma5 ", sound "bass2 ~ [bass2 ~ ] hh ~ akuma5 "])  
+$ struct "1 ~ ~ 1 ~ ~ 1 ~ 1 1" $ sound "bass2/2",
+sound "sd"
+]
+
+
+
+
+cps 1 
+
+d1 $ foldEvery [2,4] ( 444 ~>) 
+$ stack [
+  foldEvery [5,9](density 2)
+  $ sometimesBy 0.5 (stut' 6 (0.126) (#coarse 5)) 
+  $ whenmod 12  6(#randcat [ degradeBy 0.9 ( sound ( samples "stabfx*5" (irand 19)) )])
+  $ whenmod 8 4 (#randcat [ sound "akuma5 ~ bass2 ", sound "bass2 ~ [sd ~ ] hh ~ akuma5 "])
+  $ whenmod 4 2 ( density 2 )  $  sound "bass2*4" #unit "c" #cut 1,
+  every 2 (density 2 ) $ sound "sd" ,
+  sound "hh*8"
+]
+
+
+d1 $ sound "sd"
+
+
+
+
+d1 $ sound "midi"
+
+d1 $ sound "bass2"
+
+
+d1 $ sound "{ bd [ bass2 ~ ] ~  [ bass2 ~ akuma5] ~ hh [ ! bass2 ]  } % 8"
+
+
+d1 $ foldEvery [3,5] (555 ~> ) $ stack [
+  sometimesBy 0.6 ( stut' 6 (0.125 *3) (#crush 3) )
+  $ foldEvery [5,4] (density 2)
+  $ whenmod 12 6 (#randcat [ sound "arpy ~", sound "teks ~ [stabfx] ~ stabfx:3"])
+  $ whenmod 8 4 ( (#randcat [ sound "akuma5 ~ akuma5 ", sound "bass2 ~ [bass2 ~ ] hh ~ akuma5 "]))
+  $ whenmod  4 2 (density 2 ) $ sound "bass2*4" #unit "c" #cut 1,
+  every 2 (density 2 ) $ sound "selfs",
+  whenmod 8 4 (#note ("b3" + chord "m7flat9"))
+  $ sound "midi/6" 
+  # note  ("c4" + chord "m7flat9")
+  #gain 0.8 #midichan 4 
+]
+
+
+let mute = const $ sound "~"
+
+d1 
+$ foldEvery [4,6] (444 ~>) 
+$ stack[
+  whenmod 12 8 (#sound (samples "stabfx*2 bass2:4" (irand 10)  ))
+  $ sometimesBy 0.6 ( stut' 6 (0.125*3)(#crush 4))
+  $ foldEvery [5,6] (density 2)
+  $ whenmod 7 5 (#randcat [ sound "laz:2 ~ bass2", sound "stabfx ~ [ stabfx:4 ~ akuma5 ]", sound "bass2 "])
+  $ whenmod 8 4 (#randcat [ sound "akuma5 ~ akuma5 ", sound "bass2 ~ [akuma5 ~ ] hh ~ akuma5 "])
+  $ whenmod 4 2 (density 2) $ sound "bass2*4" #unit "c" #cut 1,
+  foldEvery [2,3,4]  ( struct "1(3,8/11)")
+  $ foldEvery [4,6,7](density 4)
+  $ degradeBy 0.4 $ every 2 (density 2 ) $  sound "selfs*2",
+  whenmod 8 4 ( #note ("b3" + chord "m7flat9"))
+  $ sound "midi/6" #midichan 4 #gain 0.5 
+  # note ("c4" + chord "m7flat9")
+] #room 0.5
+#size (slow 16  $ scale 0.5 0.7 $ sine)
+
+
+t1 (xfadeIn 2) $ sound "midi"
+
+
+t1 (xfadeIn 2) $ sound "midi" 
+
+cps 0.7
+
+d1 $ stack [
+  midinote ( "[{ 0 4 7 11}%24 ]/ 2" + 48 + "[4 7]/11")
+  #octave ( wchoose [1,1,8] [4,5,6]  )
+  # sound "midi",
+  whenmod 8 4 (#midinote "61 62")
+  $ struct "[ 1 1 ]/11" 
+  $ midinote "59" 
+  # sound "midi" 
+  #midichan 2,
+  struct "[1 1]/11"
+  $ whenmod 8 4 (#midinote "55")
+  $ midinote "59" # sound "midi" #midichan 3,
+  superimpose ( off 0.125 ( #crush 4) )
+  $ whenmod 12 6 (jux ( (#speed 2). (density 2) ))
+  $ whenmod 9 4 ( density 2 )
+  $ foldEvery [3,4,5] ( stut' 2 (0.1236*3) ( #accelerate 2))
+  $ degradeBy 0.4
+  $ sound ( samples "gltch*6"  (irand 10)) #cut 1
+  #gain 0.86
+  #orbit 1
+  #room 0.4
+  #size (slow 16  $ scale 0.4 0.6  $ sine)
+]
+
+
+let mute = const $ sound "~"
+
+d1 $ foldEvery [3,5] ( density 2) $ rev $ stack[
+  sound "teks:2",
+   sound "bd:5*4"
+] 
+
+
+
